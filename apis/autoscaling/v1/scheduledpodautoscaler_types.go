@@ -17,8 +17,6 @@ limitations under the License.
 package v1
 
 import (
-	"time"
-
 	autoscalingv2beta2 "k8s.io/api/autoscaling/v2beta2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -91,16 +89,6 @@ type ScheduleSpec struct {
 	// EndTime is scaling end time.
 	// +kubebuiler:validation:Required
 	EndTime string `json:"endTime"`
-}
-
-var Weekdays = map[string]time.Weekday{
-	"Monday":    time.Weekday(1),
-	"Tuesday":   time.Weekday(2),
-	"Wednesday": time.Weekday(3),
-	"Thursday":  time.Weekday(4),
-	"Friday":    time.Weekday(5),
-	"Saturday":  time.Weekday(6),
-	"Sunday":    time.Weekday(0),
 }
 
 // ScheduledPodAutoscalerStatus defines the observed state of ScheduledPodAutoscaler

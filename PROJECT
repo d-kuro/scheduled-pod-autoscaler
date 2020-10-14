@@ -1,3 +1,4 @@
 domain: d-kuro.github.io
+multigroup: true
 repo: github.com/d-kuro/scheduled-pod-autoscaler
 version: "2"

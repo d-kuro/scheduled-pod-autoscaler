@@ -121,6 +121,7 @@ type ScheduledPodAutoscaler struct {
 }
 
 // +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
 
 // ScheduledPodAutoscalerList contains a list of ScheduledPodAutoscaler
 type ScheduledPodAutoscalerList struct {

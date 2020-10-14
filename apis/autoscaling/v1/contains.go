@@ -31,7 +31,7 @@ func (s *ScheduleSpec) Contains(now time.Time) (bool, error) {
 	return false, nil
 }
 
-func (s *ScheduleSpec) normalizeTime(now time.Time) (time.Time, time.Time, error) {
+func (s *ScheduleSpec) normalizeTime(now time.Time) (normalizedStartTime time.Time, normalizedEndTime time.Time, err error) {
 	startTime, err := time.Parse("15:04", s.StartTime)
 	if err != nil {
 		return time.Time{}, time.Time{}, fmt.Errorf("startTime cannot be parsed: %w", err)
@@ -40,10 +40,10 @@ func (s *ScheduleSpec) normalizeTime(now time.Time) (time.Time, time.Time, error
 	if err != nil {
 		return time.Time{}, time.Time{}, fmt.Errorf("endTime cannot be parsed: %w", err)
 	}
-	normalizedStartTime := time.Date(
+	normalizedStartTime = time.Date(
 		now.Year(), now.Month(), now.Day(),
 		startTime.Hour(), startTime.Minute(), 0, 0, time.UTC)
-	normalizedEndTime := time.Date(
+	normalizedEndTime = time.Date(
 		now.Year(), now.Month(), now.Day(),
 		endTime.Hour(), endTime.Minute(), 0, 0, time.UTC)
 	if normalizedEndTime.Before(normalizedStartTime) {

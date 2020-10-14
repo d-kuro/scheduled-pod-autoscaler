@@ -462,7 +462,7 @@ spec:
             schedule:
               description: ScheduleList is list of schedule info.
               items:
-                description: Schedule is schedule info.
+                description: ScheduleSpec is schedule info.
                 properties:
                   description:
                     description: Description is schedule description.

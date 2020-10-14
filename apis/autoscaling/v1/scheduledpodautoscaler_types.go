@@ -37,11 +37,11 @@ type ScheduledPodAutoscalerSpec struct {
 
 	// ScheduleList is list of schedule info.
 	// +optional
-	ScheduleList []Schedule `json:"schedule"`
+	ScheduleSpecList []ScheduleSpec `json:"schedule"`
 }
 
-// Schedule is schedule info.
-type Schedule struct {
+// ScheduleSpec is schedule info.
+type ScheduleSpec struct {
 	// Suspend indicates whether to suspend this schedule.
 	// +optional
 	Suspend bool `json:"suspend,omitempty"`

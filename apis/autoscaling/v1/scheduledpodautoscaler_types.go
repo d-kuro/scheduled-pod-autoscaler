@@ -24,7 +24,7 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
-// ScheduledPodAutoscalerSpec defines the desired state of ScheduledPodAutoscaler
+// ScheduledPodAutoscalerSpec defines the desired state of ScheduledPodAutoscaler.
 type ScheduledPodAutoscalerSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
@@ -52,9 +52,14 @@ type ScheduleSpec struct {
 	// +optional
 	Description string `json:"description,omitempty"`
 
+	// TimeZoneName is the name of the timezone used in the argument of the time.LoadLocation(name string) function.
+	// StartTime and EndTime are interpreted as the time in the time zone specified by TimeZoneName.
+	// If not specified, the time will be interpreted as UTC.
+	// +optional
+	TimeZoneName string `json:"timeZoneName,omitempty"`
+
 	// MinReplicas is the lower limit for the number of replicas to which the autoscaler can scale down.
 	// It defaults to 1 pod.
-	// +kubebuilder:default=1
 	// +kubebuilder:validation:Minimum=1
 	// +optional
 	MinReplicas *int32 `json:"minReplicas,omitempty"`
@@ -91,7 +96,7 @@ type ScheduleSpec struct {
 	EndTime string `json:"endTime"`
 }
 
-// ScheduledPodAutoscalerStatus defines the observed state of ScheduledPodAutoscaler
+// ScheduledPodAutoscalerStatus defines the observed state of ScheduledPodAutoscaler.
 type ScheduledPodAutoscalerStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
@@ -99,7 +104,7 @@ type ScheduledPodAutoscalerStatus struct {
 
 // +kubebuilder:object:root=true
 
-// ScheduledPodAutoscaler is the Schema for the scheduledpodautoscalers API
+// ScheduledPodAutoscaler is the Schema for the scheduledpodautoscalers API.
 type ScheduledPodAutoscaler struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -111,7 +116,7 @@ type ScheduledPodAutoscaler struct {
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 
-// ScheduledPodAutoscalerList contains a list of ScheduledPodAutoscaler
+// ScheduledPodAutoscalerList contains a list of ScheduledPodAutoscaler.
 type ScheduledPodAutoscalerList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`

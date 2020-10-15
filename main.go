@@ -19,16 +19,15 @@ package main
 import (
 	"flag"
 	"os"
+	"time"
 
+	autoscalingv1 "github.com/d-kuro/scheduled-pod-autoscaler/apis/autoscaling/v1"
+	autoscalingcontroller "github.com/d-kuro/scheduled-pod-autoscaler/controllers/autoscaling"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
-
-	autoscalingv1 "github.com/d-kuro/scheduled-pod-autoscaler/apis/autoscaling/v1"
-	autoscalingcontroller "github.com/d-kuro/scheduled-pod-autoscaler/controllers/autoscaling"
-	// +kubebuilder:scaffold:imports
 )
 
 var (
@@ -54,10 +53,13 @@ func main() {
 
 	ctrl.SetLogger(zap.New(zap.UseDevMode(true)))
 
+	syncPeriod := 30 * time.Second
+
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:             scheme,
 		MetricsBindAddress: metricsAddr,
 		Port:               9443,
+		SyncPeriod:         &syncPeriod,
 		LeaderElection:     enableLeaderElection,
 		LeaderElectionID:   "09d94c38.d-kuro.github.io",
 	})

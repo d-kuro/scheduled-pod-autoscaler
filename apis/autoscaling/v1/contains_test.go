@@ -281,8 +281,10 @@ func TestScheduleSpecContains(t *testing.T) {
 			contains, err := tt.spec.Contains(tt.now)
 			if err != nil {
 				t.Error(err)
+
 				return
 			}
+
 			if contains != tt.expected {
 				t.Errorf("%s is not expected condition. actual:%t expected:%t time: %s - %s day: %s - %s",
 					tt.now, contains, tt.expected,

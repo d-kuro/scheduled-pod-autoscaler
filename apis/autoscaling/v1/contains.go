@@ -3,6 +3,9 @@ package v1
 import (
 	"fmt"
 	"time"
+
+	// embed tzdata
+	_ "time/tzdata"
 )
 
 var weekdays = map[string]time.Weekday{
@@ -16,7 +19,14 @@ var weekdays = map[string]time.Weekday{
 }
 
 func (s *ScheduleSpec) Contains(now time.Time) (bool, error) {
-	startTime, endTime, err := s.normalizeTime(now)
+	location, err := time.LoadLocation(s.TimeZoneName)
+	if err != nil {
+		return false, fmt.Errorf("failed to load location %s: %w", s.TimeZoneName, err)
+	}
+
+	now = now.In(location)
+
+	startTime, endTime, err := s.normalizeTime(now, location)
 	if err != nil {
 		return false, err
 	}
@@ -24,28 +34,34 @@ func (s *ScheduleSpec) Contains(now time.Time) (bool, error) {
 	if err != nil {
 		return false, err
 	}
+
+	fmt.Println("DEBUG", startTime, endTime, now)
+
 	if startWeekDay <= weekdayToday && weekdayToday <= endWeekDay {
 		// true if now is [startTime, endTime)
 		return (now.Equal(startTime) || now.After(startTime)) && now.Before(endTime), nil
 	}
+
 	return false, nil
 }
 
-func (s *ScheduleSpec) normalizeTime(now time.Time) (normalizedStartTime time.Time, normalizedEndTime time.Time, err error) {
-	startTime, err := time.Parse("15:04", s.StartTime)
+func (s *ScheduleSpec) normalizeTime(now time.Time, location *time.Location) (normalizedStartTime time.Time, normalizedEndTime time.Time, err error) {
+	startTime, err := time.ParseInLocation("15:04", s.StartTime, location)
 	if err != nil {
 		return time.Time{}, time.Time{}, fmt.Errorf("startTime cannot be parsed: %w", err)
 	}
-	endTime, err := time.Parse("15:04", s.EndTime)
+
+	endTime, err := time.ParseInLocation("15:04", s.EndTime, location)
 	if err != nil {
 		return time.Time{}, time.Time{}, fmt.Errorf("endTime cannot be parsed: %w", err)
 	}
+
 	normalizedStartTime = time.Date(
 		now.Year(), now.Month(), now.Day(),
-		startTime.Hour(), startTime.Minute(), 0, 0, time.UTC)
+		startTime.Hour(), startTime.Minute(), 0, 0, location)
 	normalizedEndTime = time.Date(
 		now.Year(), now.Month(), now.Day(),
-		endTime.Hour(), endTime.Minute(), 0, 0, time.UTC)
+		endTime.Hour(), endTime.Minute(), 0, 0, location)
 	if normalizedEndTime.Before(normalizedStartTime) {
 		if now.Hour() <= endTime.Hour() && now.Minute() <= endTime.Minute() {
 			normalizedStartTime = normalizedStartTime.AddDate(0, 0, -1)
@@ -53,6 +69,7 @@ func (s *ScheduleSpec) normalizeTime(now time.Time) (normalizedStartTime time.Ti
 			normalizedEndTime = normalizedEndTime.AddDate(0, 0, 1)
 		}
 	}
+
 	return normalizedStartTime, normalizedEndTime, nil
 }
 
@@ -75,5 +92,6 @@ func (s *ScheduleSpec) normalizeWeekday(startTime time.Time) (
 		weekdayToday = (7 + weekdayToday - startWeekDay) % 7
 		startWeekDay = 0
 	}
+
 	return weekdayToday, startWeekDay, endWeekDay, nil
 }

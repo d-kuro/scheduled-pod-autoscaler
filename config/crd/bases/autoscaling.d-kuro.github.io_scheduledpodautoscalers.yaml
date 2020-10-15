@@ -18,7 +18,7 @@ spec:
   validation:
     openAPIV3Schema:
       description: ScheduledPodAutoscaler is the Schema for the scheduledpodautoscalers
-        API
+        API.
       properties:
         apiVersion:
           description: 'APIVersion defines the versioned schema of this representation
@@ -33,7 +33,7 @@ spec:
         metadata:
           type: object
         spec:
-          description: ScheduledPodAutoscalerSpec defines the desired state of ScheduledPodAutoscaler
+          description: ScheduledPodAutoscalerSpec defines the desired state of ScheduledPodAutoscaler.
           properties:
             horizontalPodAutoscalerSpec:
               description: HorizontalPodAutoscalerSpec is HorizontalPodAutoscaler
@@ -879,7 +879,6 @@ spec:
                       type: object
                     type: array
                   minReplicas:
-                    default: 1
                     description: MinReplicas is the lower limit for the number of
                       replicas to which the autoscaler can scale down. It defaults
                       to 1 pod.
@@ -906,6 +905,13 @@ spec:
                   suspend:
                     description: Suspend indicates whether to suspend this schedule.
                     type: boolean
+                  timeZoneName:
+                    description: TimeZoneName is the name of the timezone used in
+                      the argument of the time.LoadLocation(name string) function.
+                      StartTime and EndTime are interpreted as the time in the time
+                      zone specified by TimeZoneName. If not specified, the time will
+                      be interpreted as UTC.
+                    type: string
                 required:
                 - endTime
                 - maxReplicas
@@ -918,7 +924,7 @@ spec:
           type: object
         status:
           description: ScheduledPodAutoscalerStatus defines the observed state of
-            ScheduledPodAutoscaler
+            ScheduledPodAutoscaler.
           type: object
       type: object
   version: v1

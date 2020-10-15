@@ -57,7 +57,7 @@ type ScheduleSpec struct {
 	// MaxReplicas is the upper limit for the number of replicas to which the autoscaler can scale up.
 	// +kubebuilder:validation:Minimum=1
 	// +optional
-	MaxReplicas *int32 `json:"maxReplicas"`
+	MaxReplicas *int32 `json:"maxReplicas,omitempty"`
 
 	// Metrics contains the specifications for which to use to calculate the desired replica count.
 	// +optional
@@ -93,6 +93,14 @@ type ScheduleStatus struct {
 }
 
 // +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
+// +kubebuilder:printcolumn:name="REFERENCE",type=string,priority=0,JSONPath=`.spec.scaleTargetRef.name`
+// +kubebuilder:printcolumn:name="MINPODS",type=integer,priority=1,JSONPath=`.spec.minReplicas`
+// +kubebuilder:printcolumn:name="MAXPODS",type=integer,priority=1,JSONPath=`.spec.maxReplicas`
+// +kubebuilder:printcolumn:name="STARTTIME",type=string,priority=0,JSONPath=`.spec.startTime`
+// +kubebuilder:printcolumn:name="STARTDAYOFWEEK",type=string,priority=0,JSONPath=`.spec.startDayOfWeek`
+// +kubebuilder:printcolumn:name="ENDTIME",type=string,priority=0,JSONPath=`.spec.endTime`
+// +kubebuilder:printcolumn:name="ENDDAYOFWEEK",type=string,priority=0,JSONPath=`.spec.endDayOfWeek`
 
 // Schedule is the Schema for the schedules API.
 type Schedule struct {

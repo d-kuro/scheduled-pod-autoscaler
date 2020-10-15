@@ -41,6 +41,9 @@ type ScheduledPodAutoscalerStatus struct {
 }
 
 // +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
+// +kubebuilder:printcolumn:name="MINPODS",type=integer,JSONPath=`.spec.horizontalPodAutoscalerSpec.minReplicas`
+// +kubebuilder:printcolumn:name="MAXPODS",type=integer,JSONPath=`.spec.horizontalPodAutoscalerSpec.maxReplicas`
 
 // ScheduledPodAutoscaler is the Schema for the scheduledpodautoscalers API.
 type ScheduledPodAutoscaler struct {
@@ -52,7 +55,6 @@ type ScheduledPodAutoscaler struct {
 }
 
 // +kubebuilder:object:root=true
-// +kubebuilder:subresource:status
 
 // ScheduledPodAutoscalerList contains a list of ScheduledPodAutoscaler.
 type ScheduledPodAutoscalerList struct {

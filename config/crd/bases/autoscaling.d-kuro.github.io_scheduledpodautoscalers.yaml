@@ -8,6 +8,13 @@ metadata:
   creationTimestamp: null
   name: scheduledpodautoscalers.autoscaling.d-kuro.github.io
 spec:
+  additionalPrinterColumns:
+  - JSONPath: .spec.horizontalPodAutoscalerSpec.minReplicas
+    name: MINPODS
+    type: integer
+  - JSONPath: .spec.horizontalPodAutoscalerSpec.maxReplicas
+    name: MAXPODS
+    type: integer
   group: autoscaling.d-kuro.github.io
   names:
     kind: ScheduledPodAutoscaler
@@ -15,6 +22,8 @@ spec:
     plural: scheduledpodautoscalers
     singular: scheduledpodautoscaler
   scope: Namespaced
+  subresources:
+    status: {}
   validation:
     openAPIV3Schema:
       description: ScheduledPodAutoscaler is the Schema for the scheduledpodautoscalers

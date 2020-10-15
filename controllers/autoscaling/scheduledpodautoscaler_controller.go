@@ -105,8 +105,6 @@ func (r *ScheduledPodAutoscalerReconciler) Reconcile(req ctrl.Request) (ctrl.Res
 	return ctrl.Result{}, nil
 }
 
-const ownerControllerField = ".metadata.ownerReference.controller"
-
 func (r *ScheduledPodAutoscalerReconciler) reconcileSchedule(ctx context.Context, log logr.Logger,
 	spa autoscalingv1.ScheduledPodAutoscaler, hpa hpav2beta2.HorizontalPodAutoscaler) (bool, error) {
 	var schedules autoscalingv1.ScheduleList
@@ -180,7 +178,30 @@ func (r *ScheduledPodAutoscalerReconciler) reconcileSchedule(ctx context.Context
 	return updated, nil
 }
 
+const ownerControllerField = ".metadata.ownerReference.controller"
+
+func indexByOwnerScheduledPodAutoscaler(obj runtime.Object) []string {
+	schedule := obj.(*autoscalingv1.Schedule)
+
+	owner := metav1.GetControllerOf(schedule)
+	if owner == nil {
+		return nil
+	}
+
+	if owner.APIVersion != autoscalingv1.GroupVersion.String() || owner.Kind != "Schedule" {
+		return nil
+	}
+
+	return []string{owner.Name}
+}
+
 func (r *ScheduledPodAutoscalerReconciler) SetupWithManager(mgr ctrl.Manager) error {
+	err := mgr.GetFieldIndexer().
+		IndexField(&autoscalingv1.Schedule{}, ownerControllerField, indexByOwnerScheduledPodAutoscaler)
+	if err != nil {
+		return err
+	}
+
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&autoscalingv1.ScheduledPodAutoscaler{}).
 		Owns(&autoscalingv1.Schedule{}).

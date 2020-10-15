@@ -66,6 +66,14 @@ func (r *ScheduleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, err
 	}
 
+	if err := r.Update(ctx, &schedule, &client.UpdateOptions{}); err != nil {
+		log.Error(err, "unable to update schedule", "schedule", schedule)
+
+		return ctrl.Result{}, err
+	}
+
+	log.Info("successfully update Schedule", "schedule", schedule)
+
 	return ctrl.Result{}, nil
 }
 

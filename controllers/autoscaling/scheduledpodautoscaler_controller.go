@@ -48,7 +48,7 @@ func (r *ScheduledPodAutoscalerReconciler) Reconcile(req ctrl.Request) (ctrl.Res
 
 	var spa autoscalingv1.ScheduledPodAutoscaler
 	if err := r.Get(ctx, req.NamespacedName, &spa); err != nil {
-		log.Error(err, "unable to fetch scheduledpodautoscaler")
+		log.Error(err, "unable to fetch ScheduledPodAutoscaler")
 
 		return ctrl.Result{}, err
 	}
@@ -72,14 +72,14 @@ func (r *ScheduledPodAutoscalerReconciler) Reconcile(req ctrl.Request) (ctrl.Res
 		}
 
 		if err := r.Create(ctx, &hpa, &client.CreateOptions{}); err != nil {
-			log.Info("unable to hpa", "hpa", hpa)
+			log.Info("unable to HPA", "hpa", hpa)
 
 			return ctrl.Result{}, err
 		}
 
-		log.Info("successfully create hpa", "hpa", hpa)
+		log.Info("successfully create HPA", "hpa", hpa)
 	} else if err != nil {
-		log.Error(err, "unable to fetch hpa", "namespacedName", req.NamespacedName)
+		log.Error(err, "unable to fetch HPA", "namespacedName", req.NamespacedName)
 
 		return ctrl.Result{}, err
 	}
@@ -94,12 +94,12 @@ func (r *ScheduledPodAutoscalerReconciler) Reconcile(req ctrl.Request) (ctrl.Res
 	if !updated {
 		hpa.Spec = spa.Spec.HorizontalPodAutoscalerSpec
 		if err := r.Update(ctx, &hpa, &client.UpdateOptions{}); err != nil {
-			log.Error(err, "unable to update hpa", "hpa", hpa)
+			log.Error(err, "unable to update HPA", "hpa", hpa)
 
 			return ctrl.Result{}, err
 		}
 
-		log.Info("successfully update hpa", "hpa", hpa)
+		log.Info("successfully update HPA", "hpa", hpa)
 	}
 
 	return ctrl.Result{}, nil
@@ -111,7 +111,7 @@ func (r *ScheduledPodAutoscalerReconciler) reconcileSchedule(ctx context.Context
 	spa autoscalingv1.ScheduledPodAutoscaler, hpa hpav2beta2.HorizontalPodAutoscaler) (bool, error) {
 	var schedules autoscalingv1.ScheduleList
 	if err := r.List(ctx, &schedules, client.MatchingFields(map[string]string{ownerControllerField: spa.Name})); err != nil {
-		log.Error(err, "unable to list child schedules")
+		log.Error(err, "unable to list child Schedules")
 
 		return false, err
 	}
@@ -128,7 +128,7 @@ func (r *ScheduledPodAutoscalerReconciler) reconcileSchedule(ctx context.Context
 	for _, schedule := range schedules.Items {
 		isContains, err := schedule.Spec.Contains(now)
 		if err != nil {
-			log.Error(err, "unable to check contains schedule")
+			log.Error(err, "unable to check contains Schedule")
 
 			return updated, err
 		}
@@ -147,13 +147,13 @@ func (r *ScheduledPodAutoscalerReconciler) reconcileSchedule(ctx context.Context
 			}
 
 			if err := r.Update(ctx, &hpa, &client.UpdateOptions{}); err != nil {
-				log.Error(err, "unable to update hpa", "hpa", hpa)
+				log.Error(err, "unable to update HPA", "hpa", hpa)
 
 				return updated, err
 			}
 
 			updated = true
-			log.Info("successfully update hpa", "hpa", hpa)
+			log.Info("successfully update HPA", "hpa", hpa)
 
 			return updated, nil
 		}

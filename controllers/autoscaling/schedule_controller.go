@@ -22,6 +22,7 @@ import (
 	autoscalingv1 "github.com/d-kuro/scheduled-pod-autoscaler/apis/autoscaling/v1"
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -37,10 +38,33 @@ type ScheduleReconciler struct {
 // +kubebuilder:rbac:groups=autoscaling.d-kuro.github.io,resources=schedules/status,verbs=get;update;patch
 
 func (r *ScheduleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
-	_ = context.Background()
-	_ = r.Log.WithValues("schedule", req.NamespacedName)
+	ctx := context.Background()
+	log := r.Log.WithValues("schedule", req.NamespacedName)
 
-	// your logic here
+	var schedule autoscalingv1.Schedule
+	if err := r.Get(ctx, req.NamespacedName, &schedule); err != nil {
+		log.Error(err, "unable to fetch Schedule")
+
+		return ctrl.Result{}, err
+	}
+
+	namespacedName := types.NamespacedName{
+		Namespace: schedule.Namespace,
+		Name:      schedule.Spec.ScaleTargetRef.Name,
+	}
+
+	var spa autoscalingv1.ScheduledPodAutoscaler
+	if err := r.Get(ctx, namespacedName, &spa); err != nil {
+		log.Error(err, "unable to fetch ScheduledPodAutoscaler", "namespacedName", namespacedName)
+
+		return ctrl.Result{}, err
+	}
+
+	if err := ctrl.SetControllerReference(&spa, &schedule, r.Scheme); err != nil {
+		log.Error(err, "unable to set ownerReference", "schedule", schedule)
+
+		return ctrl.Result{}, err
+	}
 
 	return ctrl.Result{}, nil
 }

@@ -1,0 +1,14 @@
+run:
+  tests: true
+linters:
+  enable-all: true
+  disable:
+  - funlen
+  - gochecknoglobals
+  - gochecknoinits
+  - goerr113
+  - gomnd
+  - lll
+  - maligned
+  - testpackage
+  - wsl

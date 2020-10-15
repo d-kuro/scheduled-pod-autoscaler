@@ -24,18 +24,19 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
-// ScheduleSpec defines the desired state of Schedule
+// ScheduleSpec defines the desired state of Schedule.
 type ScheduleSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
+	// scaleTargetRef points to the target resource to scale, and is used to the pods for which metrics
+	// should be collected, as well as to actually change the replica count.
+	// +kubebuiler:validation:Required
+	ScaleTargetRef autoscalingv2beta2.CrossVersionObjectReference `json:"scaleTargetRef"`
+
 	// Suspend indicates whether to suspend this schedule.
 	// +optional
 	Suspend bool `json:"suspend,omitempty"`
-
-	// Name is schedule name.
-	// +kubebuilder:validation:Required
-	Name string `json:"name"`
 
 	// Description is schedule description.
 	// +optional
@@ -67,13 +68,13 @@ type ScheduleSpec struct {
 	// Behavior *autoscalingv2beta2.HorizontalPodAutoscalerBehavior `json:"behavior,omitempty"`
 
 	// StartDayOfWeek is scaling start day of week.
+	// +kubebuiler:validation:Required
 	// +kubebuilder:validation:Enum=Monday;Tuesday;Wednesday;Thursday;Friday;Saturday;Sunday
-	// +optional
 	StartDayOfWeek string `json:"startDayOfWeek"`
 
 	// EndDayOfWeek is scaling end day of week.
+	// +kubebuiler:validation:Required
 	// +kubebuilder:validation:Enum=Monday;Tuesday;Wednesday;Thursday;Friday;Saturday;Sunday
-	// +optional
 	EndDayOfWeek string `json:"endDayOfWeek"`
 
 	// StartTime is scaling start time.
@@ -85,7 +86,7 @@ type ScheduleSpec struct {
 	EndTime string `json:"endTime"`
 }
 
-// ScheduleStatus defines the observed state of Schedule
+// ScheduleStatus defines the observed state of Schedule.
 type ScheduleStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
@@ -93,7 +94,7 @@ type ScheduleStatus struct {
 
 // +kubebuilder:object:root=true
 
-// Schedule is the Schema for the schedules API
+// Schedule is the Schema for the schedules API.
 type Schedule struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -104,7 +105,7 @@ type Schedule struct {
 
 // +kubebuilder:object:root=true
 
-// ScheduleList contains a list of Schedule
+// ScheduleList contains a list of Schedule.
 type ScheduleList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`

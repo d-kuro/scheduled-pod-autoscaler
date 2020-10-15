@@ -17,7 +17,7 @@ spec:
   scope: Namespaced
   validation:
     openAPIV3Schema:
-      description: Schedule is the Schema for the schedules API
+      description: Schedule is the Schema for the schedules API.
       properties:
         apiVersion:
           description: 'APIVersion defines the versioned schema of this representation
@@ -32,7 +32,7 @@ spec:
         metadata:
           type: object
         spec:
-          description: ScheduleSpec defines the desired state of Schedule
+          description: ScheduleSpec defines the desired state of Schedule.
           properties:
             description:
               description: Description is schedule description.
@@ -429,9 +429,24 @@ spec:
               format: int32
               minimum: 1
               type: integer
-            name:
-              description: Name is schedule name.
-              type: string
+            scaleTargetRef:
+              description: scaleTargetRef points to the target resource to scale,
+                and is used to the pods for which metrics should be collected, as
+                well as to actually change the replica count.
+              properties:
+                apiVersion:
+                  description: API version of the referent
+                  type: string
+                kind:
+                  description: 'Kind of the referent; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"'
+                  type: string
+                name:
+                  description: 'Name of the referent; More info: http://kubernetes.io/docs/user-guide/identifiers#names'
+                  type: string
+              required:
+              - kind
+              - name
+              type: object
             startDayOfWeek:
               description: StartDayOfWeek is scaling start day of week.
               enum:
@@ -456,12 +471,13 @@ spec:
                 If not specified, the time will be interpreted as UTC.
               type: string
           required:
+          - endDayOfWeek
           - endTime
-          - name
+          - scaleTargetRef
           - startTime
           type: object
         status:
-          description: ScheduleStatus defines the observed state of Schedule
+          description: ScheduleStatus defines the observed state of Schedule.
           type: object
       type: object
   version: v1

@@ -19,15 +19,14 @@ package controllers
 import (
 	"context"
 
+	autoscalingv1 "github.com/d-kuro/scheduled-pod-autoscaler/apis/autoscaling/v1"
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-
-	autoscalingv1 "github.com/d-kuro/scheduled-pod-autoscaler/apis/autoscaling/v1"
 )
 
-// ScheduleReconciler reconciles a Schedule object
+// ScheduleReconciler reconciles a Schedule object.
 type ScheduleReconciler struct {
 	client.Client
 	Log    logr.Logger

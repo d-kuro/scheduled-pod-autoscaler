@@ -84,14 +84,23 @@ func (r *ScheduledPodAutoscalerReconciler) Reconcile(req ctrl.Request) (ctrl.Res
 		return ctrl.Result{}, err
 	}
 
-	hpa.Spec = spa.Spec.HorizontalPodAutoscalerSpec
-	if err := r.Update(ctx, &hpa, &client.UpdateOptions{}); err != nil {
-		log.Error(err, "unable to update hpa", "hpa", hpa)
+	updated, err := r.reconcileSchedule(ctx, log, spa, hpa)
+	if err != nil {
+		log.Error(err, "unable to reconcile")
 
 		return ctrl.Result{}, err
 	}
 
-	log.Info("successfully update hpa", "hpa", hpa)
+	if !updated {
+		hpa.Spec = spa.Spec.HorizontalPodAutoscalerSpec
+		if err := r.Update(ctx, &hpa, &client.UpdateOptions{}); err != nil {
+			log.Error(err, "unable to update hpa", "hpa", hpa)
+
+			return ctrl.Result{}, err
+		}
+
+		log.Info("successfully update hpa", "hpa", hpa)
+	}
 
 	return ctrl.Result{}, nil
 }

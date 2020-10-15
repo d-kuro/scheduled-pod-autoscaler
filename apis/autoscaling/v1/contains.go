@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	// embed tzdata
+	// embed tzdata.
 	_ "time/tzdata"
 )
 

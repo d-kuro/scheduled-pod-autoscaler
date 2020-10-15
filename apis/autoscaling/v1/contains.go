@@ -9,13 +9,13 @@ import (
 )
 
 var weekdays = map[string]time.Weekday{
+	"Sunday":    time.Weekday(0),
 	"Monday":    time.Weekday(1),
 	"Tuesday":   time.Weekday(2),
 	"Wednesday": time.Weekday(3),
 	"Thursday":  time.Weekday(4),
 	"Friday":    time.Weekday(5),
 	"Saturday":  time.Weekday(6),
-	"Sunday":    time.Weekday(0),
 }
 
 func (s *ScheduleSpec) Contains(now time.Time) (bool, error) {

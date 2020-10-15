@@ -116,11 +116,29 @@ func (r *ScheduledPodAutoscalerReconciler) reconcileSchedule(ctx context.Context
 		return false, err
 	}
 
-	if len(schedules.Items) >= 2 {
-		sort.SliceStable(schedules.Items, func(i, j int) bool {
-			return schedules.Items[i].Name < schedules.Items[j].Name
-		})
-	}
+	// Sort by start day of week.
+	// If the start day of week are the same. sort by start time.
+	sort.SliceStable(schedules.Items, func(i, j int) bool {
+		if schedules.Items[i].Spec.StartDayOfWeek == schedules.Items[j].Spec.StartDayOfWeek {
+			startTime1, err := time.Parse("15:04", schedules.Items[i].Spec.StartTime)
+			if err != nil {
+				log.Error(err, "unable to parse start time", "schedule", schedules.Items[i])
+
+				return false
+			}
+
+			startTime2, err := time.Parse("15:04", schedules.Items[j].Spec.StartTime)
+			if err != nil {
+				log.Error(err, "unable to parse start time", "schedule", schedules.Items[j])
+
+				return false
+			}
+
+			return startTime1.Unix() < startTime2.Unix()
+		}
+
+		return schedules.Items[i].Spec.StartDayOfWeek < schedules.Items[j].Spec.StartDayOfWeek
+	})
 
 	now := time.Now()
 	updated := false

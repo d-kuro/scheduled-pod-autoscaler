@@ -183,5 +183,7 @@ func (r *ScheduledPodAutoscalerReconciler) reconcileSchedule(ctx context.Context
 func (r *ScheduledPodAutoscalerReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&autoscalingv1.ScheduledPodAutoscaler{}).
+		Owns(&autoscalingv1.Schedule{}).
+		Owns(&hpav2beta2.HorizontalPodAutoscaler{}).
 		Complete(r)
 }

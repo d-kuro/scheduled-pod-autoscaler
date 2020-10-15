@@ -102,7 +102,7 @@ func (r *ScheduledPodAutoscalerReconciler) Reconcile(req ctrl.Request) (ctrl.Res
 		log.Info("successfully update HPA", "hpa", hpa)
 	}
 
-	return ctrl.Result{}, nil
+	return ctrl.Result{Requeue: true, RequeueAfter: 30 * time.Second}, nil
 }
 
 func (r *ScheduledPodAutoscalerReconciler) reconcileSchedule(ctx context.Context, log logr.Logger,

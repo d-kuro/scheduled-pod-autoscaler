@@ -53,7 +53,7 @@ func main() {
 
 	ctrl.SetLogger(zap.New(zap.UseDevMode(true)))
 
-	syncPeriod := 30 * time.Second
+	syncPeriod := 1 * time.Hour
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:             scheme,

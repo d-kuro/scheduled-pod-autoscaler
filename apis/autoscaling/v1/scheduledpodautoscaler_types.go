@@ -32,68 +32,6 @@ type ScheduledPodAutoscalerSpec struct {
 	// HorizontalPodAutoscalerSpec is HorizontalPodAutoscaler v2beta2 API spec.
 	// +kubebuilder:validation:Required
 	HorizontalPodAutoscalerSpec autoscalingv2beta2.HorizontalPodAutoscalerSpec `json:"horizontalPodAutoscalerSpec"`
-
-	// ScheduleList is list of schedule info.
-	// +optional
-	ScheduleSpecList []ScheduleSpec `json:"schedule"`
-}
-
-// ScheduleSpec is schedule info.
-type ScheduleSpec struct {
-	// Suspend indicates whether to suspend this schedule.
-	// +optional
-	Suspend bool `json:"suspend,omitempty"`
-
-	// Name is schedule name.
-	// +kubebuilder:validation:Required
-	Name string `json:"name"`
-
-	// Description is schedule description.
-	// +optional
-	Description string `json:"description,omitempty"`
-
-	// TimeZoneName is the name of the timezone used in the argument of the time.LoadLocation(name string) function.
-	// StartTime and EndTime are interpreted as the time in the time zone specified by TimeZoneName.
-	// If not specified, the time will be interpreted as UTC.
-	// +optional
-	TimeZoneName string `json:"timeZoneName,omitempty"`
-
-	// MinReplicas is the lower limit for the number of replicas to which the autoscaler can scale down.
-	// It defaults to 1 pod.
-	// +kubebuilder:validation:Minimum=1
-	// +optional
-	MinReplicas *int32 `json:"minReplicas,omitempty"`
-
-	// MaxReplicas is the upper limit for the number of replicas to which the autoscaler can scale up.
-	// +kubebuilder:validation:Minimum=1
-	// +optional
-	MaxReplicas *int32 `json:"maxReplicas"`
-
-	// Metrics contains the specifications for which to use to calculate the desired replica count.
-	// +optional
-	Metrics []autoscalingv2beta2.MetricSpec `json:"metrics,omitempty"`
-
-	// Behavior configures the scaling behavior of the target in both Up and Down directions.
-	// +optional
-	// Behavior *autoscalingv2beta2.HorizontalPodAutoscalerBehavior `json:"behavior,omitempty"`
-
-	// StartDayOfWeek is scaling start day of week.
-	// +kubebuilder:validation:Enum=Monday;Tuesday;Wednesday;Thursday;Friday;Saturday;Sunday
-	// +optional
-	StartDayOfWeek string `json:"startDayOfWeek"`
-
-	// EndDayOfWeek is scaling end day of week.
-	// +kubebuilder:validation:Enum=Monday;Tuesday;Wednesday;Thursday;Friday;Saturday;Sunday
-	// +optional
-	EndDayOfWeek string `json:"endDayOfWeek"`
-
-	// StartTime is scaling start time.
-	// +kubebuiler:validation:Required
-	StartTime string `json:"startTime"`
-
-	// EndTime is scaling end time.
-	// +kubebuiler:validation:Required
-	EndTime string `json:"endTime"`
 }
 
 // ScheduledPodAutoscalerStatus defines the observed state of ScheduledPodAutoscaler.

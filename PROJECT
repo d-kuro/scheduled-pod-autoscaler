@@ -5,4 +5,7 @@ resources:
 - group: autoscaling
   kind: ScheduledPodAutoscaler
   version: v1
+- group: autoscaling
+  kind: Schedule
+  version: v1
 version: "2"

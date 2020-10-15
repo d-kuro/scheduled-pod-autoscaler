@@ -38,3 +38,23 @@ rules:
   - get
   - patch
   - update
+- apiGroups:
+  - autoscaling.d-kuro.github.io
+  resources:
+  - schedules
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - autoscaling.d-kuro.github.io
+  resources:
+  - schedules/status
+  verbs:
+  - get
+  - patch
+  - update

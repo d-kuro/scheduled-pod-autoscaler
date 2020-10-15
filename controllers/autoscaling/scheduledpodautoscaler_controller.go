@@ -46,8 +46,8 @@ func (r *ScheduledPodAutoscalerReconciler) Reconcile(req ctrl.Request) (ctrl.Res
 	ctx := context.Background()
 	log := r.Log.WithValues("scheduledpodautoscaler", req.NamespacedName)
 
-	var scheduledPodAutoscaler autoscalingv1.ScheduledPodAutoscaler
-	if err := r.Get(ctx, req.NamespacedName, &scheduledPodAutoscaler); err != nil {
+	var spa autoscalingv1.ScheduledPodAutoscaler
+	if err := r.Get(ctx, req.NamespacedName, &spa); err != nil {
 		log.Error(err, "unable to fetch scheduledpodautoscaler")
 
 		return ctrl.Result{}, err
@@ -62,10 +62,10 @@ func (r *ScheduledPodAutoscalerReconciler) Reconcile(req ctrl.Request) (ctrl.Res
 				Name:      req.Name,
 				Namespace: req.Namespace,
 			},
-			Spec: scheduledPodAutoscaler.Spec.HorizontalPodAutoscalerSpec,
+			Spec: spa.Spec.HorizontalPodAutoscalerSpec,
 		}
 
-		if err := ctrl.SetControllerReference(&scheduledPodAutoscaler, &hpa, r.Scheme); err != nil {
+		if err := ctrl.SetControllerReference(&spa, &hpa, r.Scheme); err != nil {
 			log.Error(err, "unable to set ownerReference", "hpa", hpa)
 
 			return ctrl.Result{}, err
@@ -84,48 +84,7 @@ func (r *ScheduledPodAutoscalerReconciler) Reconcile(req ctrl.Request) (ctrl.Res
 		return ctrl.Result{}, err
 	}
 
-	if len(scheduledPodAutoscaler.Spec.ScheduleSpecList) >= 2 {
-		sort.SliceStable(scheduledPodAutoscaler.Spec.ScheduleSpecList, func(i, j int) bool {
-			return scheduledPodAutoscaler.Spec.ScheduleSpecList[i].Name < scheduledPodAutoscaler.Spec.ScheduleSpecList[j].Name
-		})
-	}
-
-	now := time.Now()
-
-	for _, schedule := range scheduledPodAutoscaler.Spec.ScheduleSpecList {
-		isContains, err := schedule.Contains(now)
-		if err != nil {
-			log.Error(err, "unable to check contains schedule")
-
-			return ctrl.Result{}, err
-		}
-
-		if isContains {
-			if schedule.MaxReplicas != nil {
-				hpa.Spec.MaxReplicas = *schedule.MaxReplicas
-			}
-
-			if schedule.MinReplicas != nil {
-				hpa.Spec.MinReplicas = schedule.MinReplicas
-			}
-
-			if schedule.Metrics != nil {
-				hpa.Spec.Metrics = schedule.Metrics
-			}
-
-			if err := r.Update(ctx, &hpa, &client.UpdateOptions{}); err != nil {
-				log.Error(err, "unable to update hpa", "hpa", hpa)
-
-				return ctrl.Result{}, err
-			}
-
-			log.Info("successfully update hpa", "hpa", hpa)
-
-			return ctrl.Result{}, nil
-		}
-	}
-
-	hpa.Spec = scheduledPodAutoscaler.Spec.HorizontalPodAutoscalerSpec
+	hpa.Spec = spa.Spec.HorizontalPodAutoscalerSpec
 	if err := r.Update(ctx, &hpa, &client.UpdateOptions{}); err != nil {
 		log.Error(err, "unable to update hpa", "hpa", hpa)
 
@@ -135,6 +94,63 @@ func (r *ScheduledPodAutoscalerReconciler) Reconcile(req ctrl.Request) (ctrl.Res
 	log.Info("successfully update hpa", "hpa", hpa)
 
 	return ctrl.Result{}, nil
+}
+
+const ownerControllerField = ".metadata.ownerReference.controller"
+
+func (r *ScheduledPodAutoscalerReconciler) reconcileSchedule(ctx context.Context, log logr.Logger,
+	spa autoscalingv1.ScheduledPodAutoscaler, hpa hpav2beta2.HorizontalPodAutoscaler) (bool, error) {
+	var schedules autoscalingv1.ScheduleList
+	if err := r.List(ctx, &schedules, client.MatchingFields(map[string]string{ownerControllerField: spa.Name})); err != nil {
+		log.Error(err, "unable to list child schedules")
+
+		return false, err
+	}
+
+	if len(schedules.Items) >= 2 {
+		sort.SliceStable(schedules.Items, func(i, j int) bool {
+			return schedules.Items[i].Name < schedules.Items[j].Name
+		})
+	}
+
+	now := time.Now()
+	updated := false
+
+	for _, schedule := range schedules.Items {
+		isContains, err := schedule.Spec.Contains(now)
+		if err != nil {
+			log.Error(err, "unable to check contains schedule")
+
+			return updated, err
+		}
+
+		if isContains {
+			if schedule.Spec.MaxReplicas != nil {
+				hpa.Spec.MaxReplicas = *schedule.Spec.MaxReplicas
+			}
+
+			if schedule.Spec.MinReplicas != nil {
+				hpa.Spec.MinReplicas = schedule.Spec.MinReplicas
+			}
+
+			if schedule.Spec.Metrics != nil {
+				hpa.Spec.Metrics = schedule.Spec.Metrics
+			}
+
+			if err := r.Update(ctx, &hpa, &client.UpdateOptions{}); err != nil {
+				log.Error(err, "unable to update hpa", "hpa", hpa)
+
+				return updated, err
+			}
+
+			updated = true
+			log.Info("successfully update hpa", "hpa", hpa)
+
+			return updated, nil
+		}
+	}
+
+	return updated, nil
 }
 
 func (r *ScheduledPodAutoscalerReconciler) SetupWithManager(mgr ctrl.Manager) error {

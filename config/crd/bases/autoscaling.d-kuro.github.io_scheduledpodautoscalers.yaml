@@ -914,7 +914,6 @@ spec:
                     type: string
                 required:
                 - endTime
-                - maxReplicas
                 - name
                 - startTime
                 type: object

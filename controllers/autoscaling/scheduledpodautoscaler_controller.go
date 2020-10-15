@@ -48,13 +48,15 @@ func (r *ScheduledPodAutoscalerReconciler) Reconcile(req ctrl.Request) (ctrl.Res
 
 	var scheduledPodAutoscaler autoscalingv1.ScheduledPodAutoscaler
 	if err := r.Get(ctx, req.NamespacedName, &scheduledPodAutoscaler); err != nil {
-		log.Error(err, "unable to fetch ScheduledPodAutoscaler")
+		log.Error(err, "unable to fetch scheduledpodautoscaler")
 
 		return ctrl.Result{}, err
 	}
 
 	var hpa hpav2beta2.HorizontalPodAutoscaler
 	if err := r.Get(ctx, req.NamespacedName, &hpa); apierrors.IsNotFound(err) {
+		log.Info("unable to fetch hpa, try to create one", "namespacedName", req.NamespacedName)
+
 		hpa = hpav2beta2.HorizontalPodAutoscaler{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      req.Name,
@@ -64,13 +66,21 @@ func (r *ScheduledPodAutoscalerReconciler) Reconcile(req ctrl.Request) (ctrl.Res
 		}
 
 		if err := ctrl.SetControllerReference(&scheduledPodAutoscaler, &hpa, r.Scheme); err != nil {
+			log.Error(err, "unable to set ownerReference", "hpa", hpa)
+
 			return ctrl.Result{}, err
 		}
 
 		if err := r.Create(ctx, &hpa, &client.CreateOptions{}); err != nil {
+			log.Info("unable to hpa", "hpa", hpa)
+
 			return ctrl.Result{}, err
 		}
+
+		log.Info("successfully create hpa", "hpa", hpa)
 	} else if err != nil {
+		log.Error(err, "unable to fetch hpa", "namespacedName", req.NamespacedName)
+
 		return ctrl.Result{}, err
 	}
 
@@ -85,17 +95,31 @@ func (r *ScheduledPodAutoscalerReconciler) Reconcile(req ctrl.Request) (ctrl.Res
 	for _, schedule := range scheduledPodAutoscaler.Spec.ScheduleSpecList {
 		isContains, err := schedule.Contains(now)
 		if err != nil {
+			log.Error(err, "unable to check contains schedule")
+
 			return ctrl.Result{}, err
 		}
 
 		if isContains {
-			hpa.Spec.MaxReplicas = schedule.MaxReplicas
-			hpa.Spec.MinReplicas = schedule.MinReplicas
-			hpa.Spec.Metrics = schedule.Metrics
+			if schedule.MaxReplicas != nil {
+				hpa.Spec.MaxReplicas = *schedule.MaxReplicas
+			}
+
+			if schedule.MinReplicas != nil {
+				hpa.Spec.MinReplicas = schedule.MinReplicas
+			}
+
+			if schedule.Metrics != nil {
+				hpa.Spec.Metrics = schedule.Metrics
+			}
 
 			if err := r.Update(ctx, &hpa, &client.UpdateOptions{}); err != nil {
+				log.Error(err, "unable to update hpa", "hpa", hpa)
+
 				return ctrl.Result{}, err
 			}
+
+			log.Info("successfully update hpa", "hpa", hpa)
 
 			return ctrl.Result{}, nil
 		}
@@ -103,8 +127,12 @@ func (r *ScheduledPodAutoscalerReconciler) Reconcile(req ctrl.Request) (ctrl.Res
 
 	hpa.Spec = scheduledPodAutoscaler.Spec.HorizontalPodAutoscalerSpec
 	if err := r.Update(ctx, &hpa, &client.UpdateOptions{}); err != nil {
+		log.Error(err, "unable to update hpa", "hpa", hpa)
+
 		return ctrl.Result{}, err
 	}
+
+	log.Info("successfully update hpa", "hpa", hpa)
 
 	return ctrl.Result{}, nil
 }

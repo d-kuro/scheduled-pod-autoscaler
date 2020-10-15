@@ -33,6 +33,11 @@ func (in *ScheduleSpec) DeepCopyInto(out *ScheduleSpec) {
 		*out = new(int32)
 		**out = **in
 	}
+	if in.MaxReplicas != nil {
+		in, out := &in.MaxReplicas, &out.MaxReplicas
+		*out = new(int32)
+		**out = **in
+	}
 	if in.Metrics != nil {
 		in, out := &in.Metrics, &out.Metrics
 		*out = make([]v2beta2.MetricSpec, len(*in))

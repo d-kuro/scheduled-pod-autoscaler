@@ -65,9 +65,9 @@ type ScheduleSpec struct {
 	MinReplicas *int32 `json:"minReplicas,omitempty"`
 
 	// MaxReplicas is the upper limit for the number of replicas to which the autoscaler can scale up.
-	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Minimum=1
-	MaxReplicas int32 `json:"maxReplicas"`
+	// +optional
+	MaxReplicas *int32 `json:"maxReplicas"`
 
 	// Metrics contains the specifications for which to use to calculate the desired replica count.
 	// +optional

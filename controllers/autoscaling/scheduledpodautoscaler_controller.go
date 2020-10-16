@@ -178,6 +178,46 @@ func (r *ScheduledPodAutoscalerReconciler) reconcileSchedule(ctx context.Context
 	return updated, nil
 }
 
+func setScheduledPodAutoscalerAvailableStatus(spa *autoscalingv1.ScheduledPodAutoscaler) bool {
+	updated := false
+
+	currentSuspendCond := findCondition(spa.Status.Conditions, string(autoscalingv1.AvailableScheduledPodAutoscalerCondition))
+	if currentSuspendCond == nil || currentSuspendCond.Status != autoscalingv1.ConditionTrue {
+		setCondition(&spa.Status.Conditions, autoscalingv1.Condition{
+			Type:    string(autoscalingv1.AvailableScheduledPodAutoscalerCondition),
+			Status:  autoscalingv1.ConditionTrue,
+			Reason:  "Available",
+			Message: "Available to ScheduledPodAutoscaler.",
+		})
+
+		spa.Status.Phase = autoscalingv1.AvailableScheduledPodAutoscalerStatus
+
+		updated = true
+	}
+
+	return updated
+}
+
+func setScheduledPodAutoscalerUnavailableStatus(spa *autoscalingv1.ScheduledPodAutoscaler) bool {
+	updated := false
+
+	currentSuspendCond := findCondition(spa.Status.Conditions, string(autoscalingv1.AvailableScheduledPodAutoscalerCondition))
+	if currentSuspendCond == nil || currentSuspendCond.Status != autoscalingv1.ConditionFalse {
+		setCondition(&spa.Status.Conditions, autoscalingv1.Condition{
+			Type:    string(autoscalingv1.AvailableScheduledPodAutoscalerCondition),
+			Status:  autoscalingv1.ConditionFalse,
+			Reason:  "Unavailable",
+			Message: "Unavailable to ScheduledPodAutoscaler.",
+		})
+
+		spa.Status.Phase = autoscalingv1.UnavailableScheduledPodAutoscalerStatus
+
+		updated = true
+	}
+
+	return updated
+}
+
 const ownerControllerField = ".metadata.controller"
 
 func indexByOwnerScheduledPodAutoscaler(obj runtime.Object) []string {

@@ -89,9 +89,10 @@ type ScheduleSpec struct {
 type ScheduleStatusType string
 
 const (
-	ScheduleSuspend     ScheduleStatusType = "Suspend"
 	ScheduleAvailable   ScheduleStatusType = "Available"
+	ScheduleSuspend     ScheduleStatusType = "Suspend"
 	ScheduleProgressing ScheduleStatusType = "Progressing"
+	ScheduleDegraded    ScheduleStatusType = "Degraded"
 )
 
 // ScheduleStatus defines the observed state of Schedule.

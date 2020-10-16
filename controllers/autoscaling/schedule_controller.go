@@ -81,7 +81,7 @@ func (r *ScheduleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	}
 
 	if schedule.Spec.Suspend {
-		if updated := setSuspendStatus(&schedule); updated {
+		if updated := setScheduleSuspendStatus(&schedule); updated {
 			r.Recorder.Event(&schedule, corev1.EventTypeNormal, "Updated", "The schedule was updated.")
 
 			if err := r.Status().Update(ctx, &schedule); err != nil {
@@ -94,7 +94,7 @@ func (r *ScheduleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, nil
 	}
 
-	if updated := setAvailableStatus(&schedule); updated {
+	if updated := setScheduleAvailableStatus(&schedule); updated {
 		r.Recorder.Event(&schedule, corev1.EventTypeNormal, "Updated", "The schedule was updated.")
 
 		if err := r.Status().Update(ctx, &schedule); err != nil {
@@ -107,7 +107,7 @@ func (r *ScheduleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	return ctrl.Result{}, nil
 }
 
-func setSuspendStatus(schedule *autoscalingv1.Schedule) bool {
+func setScheduleSuspendStatus(schedule *autoscalingv1.Schedule) bool {
 	updated := false
 
 	currentSuspendCond := findCondition(schedule.Status.Conditions, string(autoscalingv1.ScheduleSuspend))
@@ -139,7 +139,7 @@ func setSuspendStatus(schedule *autoscalingv1.Schedule) bool {
 	return updated
 }
 
-func setAvailableStatus(schedule *autoscalingv1.Schedule) bool {
+func setScheduleAvailableStatus(schedule *autoscalingv1.Schedule) bool {
 	updated := false
 
 	currentAvailableCond := findCondition(schedule.Status.Conditions, string(autoscalingv1.ScheduleAvailable))

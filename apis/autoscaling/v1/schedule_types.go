@@ -86,10 +86,22 @@ type ScheduleSpec struct {
 	EndTime string `json:"endTime"`
 }
 
+type ScheduleConditionType string
+
+const (
+	ScheduleConditionAvailable   ScheduleConditionType = "Available"
+	ScheduleConditionProgressing ScheduleConditionType = "Progressing"
+	ScheduleConditionDegraded    ScheduleConditionType = "Degraded"
+)
+
 // ScheduleStatus defines the observed state of Schedule.
 type ScheduleStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+
+	// Conditions is an array of conditions.
+	// +optional
+	Conditions []Condition `json:"conditions,omitempty"`
 }
 
 // +kubebuilder:object:root=true

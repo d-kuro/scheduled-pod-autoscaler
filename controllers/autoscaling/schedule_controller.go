@@ -21,8 +21,11 @@ import (
 
 	autoscalingv1 "github.com/d-kuro/scheduled-pod-autoscaler/apis/autoscaling/v1"
 	"github.com/go-logr/logr"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -30,8 +33,9 @@ import (
 // ScheduleReconciler reconciles a Schedule object.
 type ScheduleReconciler struct {
 	client.Client
-	Log    logr.Logger
-	Scheme *runtime.Scheme
+	Log      logr.Logger
+	Scheme   *runtime.Scheme
+	Recorder record.EventRecorder
 }
 
 // +kubebuilder:rbac:groups=autoscaling.d-kuro.github.io,resources=schedules,verbs=get;list;watch;create;update;patch;delete
@@ -45,7 +49,7 @@ func (r *ScheduleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	if err := r.Get(ctx, req.NamespacedName, &schedule); err != nil {
 		log.Error(err, "unable to fetch Schedule")
 
-		return ctrl.Result{}, err
+		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
 	namespacedName := types.NamespacedName{
@@ -60,21 +64,111 @@ func (r *ScheduleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, err
 	}
 
-	if err := ctrl.SetControllerReference(&spa, &schedule, r.Scheme); err != nil {
-		log.Error(err, "unable to set ownerReference", "schedule", schedule)
+	if existing := metav1.GetControllerOf(&schedule); existing == nil {
+		if err := ctrl.SetControllerReference(&spa, &schedule, r.Scheme); err != nil {
+			log.Error(err, "unable to set ownerReference", "schedule", schedule)
 
-		return ctrl.Result{}, err
+			return ctrl.Result{}, err
+		}
+
+		if err := r.Update(ctx, &schedule, &client.UpdateOptions{}); err != nil {
+			log.Error(err, "unable to update schedule", "schedule", schedule)
+
+			return ctrl.Result{}, err
+		}
+
+		log.Info("successfully update Schedule", "schedule", schedule)
 	}
 
-	if err := r.Update(ctx, &schedule, &client.UpdateOptions{}); err != nil {
-		log.Error(err, "unable to update schedule", "schedule", schedule)
+	if schedule.Spec.Suspend {
+		if updated := setSuspendStatus(&schedule); updated {
+			r.Recorder.Event(&schedule, corev1.EventTypeNormal, "Updated", "The schedule was updated.")
 
-		return ctrl.Result{}, err
+			if err := r.Status().Update(ctx, &schedule); err != nil {
+				log.Error(err, "unable to update schedule status", "schedule", schedule)
+
+				return ctrl.Result{}, err
+			}
+		}
+
+		return ctrl.Result{}, nil
 	}
 
-	log.Info("successfully update Schedule", "schedule", schedule)
+	if updated := setAvailableStatus(&schedule); updated {
+		r.Recorder.Event(&schedule, corev1.EventTypeNormal, "Updated", "The schedule was updated.")
+
+		if err := r.Status().Update(ctx, &schedule); err != nil {
+			log.Error(err, "unable to update schedule status", "schedule", schedule)
+
+			return ctrl.Result{}, err
+		}
+	}
 
 	return ctrl.Result{}, nil
+}
+
+func setSuspendStatus(schedule *autoscalingv1.Schedule) bool {
+	updated := false
+
+	currentSuspendCond := findCondition(schedule.Status.Conditions, string(autoscalingv1.ScheduleSuspend))
+	if currentSuspendCond == nil || currentSuspendCond.Status != autoscalingv1.ConditionTrue {
+		setCondition(&schedule.Status.Conditions, autoscalingv1.Condition{
+			Type:    string(autoscalingv1.ScheduleSuspend),
+			Status:  autoscalingv1.ConditionTrue,
+			Reason:  "SuspendScheduling",
+			Message: "Suspend to scheduled scheduling.",
+		})
+
+		schedule.Status.Phase = autoscalingv1.ScheduleSuspend
+
+		updated = true
+	}
+
+	currentAvailableCond := findCondition(schedule.Status.Conditions, string(autoscalingv1.ScheduleAvailable))
+	if currentAvailableCond == nil || currentAvailableCond.Status != autoscalingv1.ConditionFalse {
+		setCondition(&schedule.Status.Conditions, autoscalingv1.Condition{
+			Type:    string(autoscalingv1.ScheduleAvailable),
+			Status:  autoscalingv1.ConditionFalse,
+			Reason:  "SuspendScheduling",
+			Message: "Suspend to scheduled scheduling.",
+		})
+
+		updated = true
+	}
+
+	return updated
+}
+
+func setAvailableStatus(schedule *autoscalingv1.Schedule) bool {
+	updated := false
+
+	currentAvailableCond := findCondition(schedule.Status.Conditions, string(autoscalingv1.ScheduleAvailable))
+	if currentAvailableCond == nil || currentAvailableCond.Status != autoscalingv1.ConditionTrue {
+		setCondition(&schedule.Status.Conditions, autoscalingv1.Condition{
+			Type:    string(autoscalingv1.ScheduleAvailable),
+			Status:  autoscalingv1.ConditionTrue,
+			Reason:  "SchedulingAvailable",
+			Message: "Available to scheduled scheduling.",
+		})
+
+		schedule.Status.Phase = autoscalingv1.ScheduleAvailable
+
+		updated = true
+	}
+
+	currentSuspendCond := findCondition(schedule.Status.Conditions, string(autoscalingv1.ScheduleSuspend))
+	if currentSuspendCond == nil || currentSuspendCond.Status != autoscalingv1.ConditionFalse {
+		setCondition(&schedule.Status.Conditions, autoscalingv1.Condition{
+			Type:    string(autoscalingv1.ScheduleSuspend),
+			Status:  autoscalingv1.ConditionFalse,
+			Reason:  "SchedulingAvailable",
+			Message: "Available to scheduled scheduling.",
+		})
+
+		updated = true
+	}
+
+	return updated
 }
 
 func (r *ScheduleReconciler) SetupWithManager(mgr ctrl.Manager) error {

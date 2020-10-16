@@ -36,7 +36,7 @@ type ScheduleSpec struct {
 
 	// Suspend indicates whether to suspend this schedule.
 	// +optional
-	Suspend bool `json:"suspend,omitempty"`
+	Suspend bool `json:"suspend"`
 
 	// Description is schedule description.
 	// +optional
@@ -86,12 +86,12 @@ type ScheduleSpec struct {
 	EndTime string `json:"endTime"`
 }
 
-type ScheduleConditionType string
+type ScheduleStatusType string
 
 const (
-	ScheduleConditionAvailable   ScheduleConditionType = "Available"
-	ScheduleConditionProgressing ScheduleConditionType = "Progressing"
-	ScheduleConditionDegraded    ScheduleConditionType = "Degraded"
+	ScheduleSuspend     ScheduleStatusType = "Suspend"
+	ScheduleAvailable   ScheduleStatusType = "Available"
+	ScheduleProgressing ScheduleStatusType = "Progressing"
 )
 
 // ScheduleStatus defines the observed state of Schedule.
@@ -102,6 +102,8 @@ type ScheduleStatus struct {
 	// Conditions is an array of conditions.
 	// +optional
 	Conditions []Condition `json:"conditions,omitempty"`
+
+	Phase ScheduleStatusType `json:"phase,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -113,8 +115,8 @@ type ScheduleStatus struct {
 // +kubebuilder:printcolumn:name="ENDDAYOFWEEK",type=string,JSONPath=`.spec.endDayOfWeek`,priority=0
 // +kubebuilder:printcolumn:name="MINPODS",type=integer,JSONPath=`.spec.minReplicas`,priority=1
 // +kubebuilder:printcolumn:name="MAXPODS",type=integer,JSONPath=`.spec.maxReplicas`,priority=1
-// +kubebuilder:printcolumn:name="SUSPEND",type=string,JSONPath=`.spec.suspend`,priority=0
-// +kubebuilder:printcolumn:name="AGE",type="date",JSONPath=".metadata.creationTimestamp",priority=0
+// +kubebuilder:printcolumn:name="STATUS",type=string,JSONPath=`.status.phase`,priority=0
+// +kubebuilder:printcolumn:name="AGE",type="date",JSONPath=`.metadata.creationTimestamp`,priority=0
 
 // Schedule is the Schema for the schedules API.
 type Schedule struct {

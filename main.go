@@ -76,14 +76,17 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "ScheduledPodAutoscaler")
 		os.Exit(1)
 	}
+
 	if err = (&autoscalingcontroller.ScheduleReconciler{
-		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("Schedule"),
-		Scheme: mgr.GetScheme(),
+		Client:   mgr.GetClient(),
+		Log:      ctrl.Log.WithName("controllers").WithName("Schedule"),
+		Scheme:   mgr.GetScheme(),
+		Recorder: mgr.GetEventRecorderFor("schedule-controller"),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Schedule")
 		os.Exit(1)
 	}
+
 	// +kubebuilder:scaffold:builder
 
 	setupLog.Info("starting manager")

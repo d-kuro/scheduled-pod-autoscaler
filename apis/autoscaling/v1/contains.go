@@ -30,12 +30,11 @@ func (s *ScheduleSpec) Contains(now time.Time) (bool, error) {
 	if err != nil {
 		return false, err
 	}
+
 	weekdayToday, startWeekDay, endWeekDay, err := s.normalizeWeekday(startTime)
 	if err != nil {
 		return false, err
 	}
-
-	fmt.Println("DEBUG", startTime, endTime, now)
 
 	if startWeekDay <= weekdayToday && weekdayToday <= endWeekDay {
 		// true if now is [startTime, endTime)
@@ -59,9 +58,11 @@ func (s *ScheduleSpec) normalizeTime(now time.Time, location *time.Location) (no
 	normalizedStartTime = time.Date(
 		now.Year(), now.Month(), now.Day(),
 		startTime.Hour(), startTime.Minute(), 0, 0, location)
+
 	normalizedEndTime = time.Date(
 		now.Year(), now.Month(), now.Day(),
 		endTime.Hour(), endTime.Minute(), 0, 0, location)
+
 	if normalizedEndTime.Before(normalizedStartTime) {
 		if now.Hour() <= endTime.Hour() && now.Minute() <= endTime.Minute() {
 			normalizedStartTime = normalizedStartTime.AddDate(0, 0, -1)

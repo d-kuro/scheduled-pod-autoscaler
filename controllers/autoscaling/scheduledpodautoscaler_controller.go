@@ -178,7 +178,7 @@ func (r *ScheduledPodAutoscalerReconciler) reconcileSchedule(ctx context.Context
 	return updated, nil
 }
 
-const ownerControllerField = ".metadata.ownerReference.controller"
+const ownerControllerField = ".metadata.controller"
 
 func indexByOwnerScheduledPodAutoscaler(obj runtime.Object) []string {
 	schedule := obj.(*autoscalingv1.Schedule)
@@ -188,7 +188,7 @@ func indexByOwnerScheduledPodAutoscaler(obj runtime.Object) []string {
 		return nil
 	}
 
-	if owner.APIVersion != autoscalingv1.GroupVersion.String() || owner.Kind != "Schedule" {
+	if owner.APIVersion != autoscalingv1.GroupVersion.String() || owner.Kind != "ScheduledPodAutoscaler" {
 		return nil
 	}
 

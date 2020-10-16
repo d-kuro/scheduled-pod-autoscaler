@@ -694,6 +694,7 @@ spec:
                 type: object
               type: array
             phase:
+              description: Phase is schedule status type.
               type: string
           type: object
       type: object

@@ -103,6 +103,8 @@ type ScheduleStatus struct {
 	// +optional
 	Conditions []Condition `json:"conditions,omitempty"`
 
+	// Phase is schedule status type.
+	// +optional
 	Phase ScheduleStatusType `json:"phase,omitempty"`
 }
 

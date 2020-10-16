@@ -65,7 +65,7 @@ type ScheduleSpec struct {
 
 	// Behavior configures the scaling behavior of the target in both Up and Down directions.
 	// +optional
-	// Behavior *autoscalingv2beta2.HorizontalPodAutoscalerBehavior `json:"behavior,omitempty"`
+	Behavior *autoscalingv2beta2.HorizontalPodAutoscalerBehavior `json:"behavior,omitempty"`
 
 	// StartDayOfWeek is scaling start day of week.
 	// +kubebuiler:validation:Required
@@ -101,6 +101,7 @@ type ScheduleStatus struct {
 // +kubebuilder:printcolumn:name="STARTDAYOFWEEK",type=string,JSONPath=`.spec.startDayOfWeek`
 // +kubebuilder:printcolumn:name="ENDTIME",type=string,JSONPath=`.spec.endTime`
 // +kubebuilder:printcolumn:name="ENDDAYOFWEEK",type=string,JSONPath=`.spec.endDayOfWeek`
+// +kubebuilder:printcolumn:name="SUSPEND",type=string,JSONPath=`.spec.suspend`
 
 // Schedule is the Schema for the schedules API.
 type Schedule struct {

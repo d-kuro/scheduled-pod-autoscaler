@@ -86,13 +86,13 @@ type ScheduleSpec struct {
 	EndTime string `json:"endTime"`
 }
 
-type ScheduleStatusType string
+type ScheduleConditionType string
 
 const (
-	ScheduleAvailable   ScheduleStatusType = "Available"
-	ScheduleSuspend     ScheduleStatusType = "Suspend"
-	ScheduleProgressing ScheduleStatusType = "Progressing"
-	ScheduleDegraded    ScheduleStatusType = "Degraded"
+	ScheduleAvailable   ScheduleConditionType = "Available"
+	ScheduleSuspend     ScheduleConditionType = "Suspend"
+	ScheduleProgressing ScheduleConditionType = "Progressing"
+	ScheduleDegraded    ScheduleConditionType = "Degraded"
 )
 
 // ScheduleStatus defines the observed state of Schedule.
@@ -100,13 +100,15 @@ type ScheduleStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	// Conditions is an array of conditions.
+	// LastTransitionTime is the last time the condition transitioned from one status to another.
+	// +kubebuilder:validation:Type=string
+	// +kubebuilder:validation:Format=date-time
 	// +optional
-	Conditions []Condition `json:"conditions,omitempty"`
+	LastTransitionTime metav1.Time `json:"lastTransitionTime"`
 
-	// Phase is schedule status type.
+	// Condition is schedule status type.
 	// +optional
-	Phase ScheduleStatusType `json:"phase,omitempty"`
+	Condition ScheduleConditionType `json:"condition,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -118,7 +120,7 @@ type ScheduleStatus struct {
 // +kubebuilder:printcolumn:name="ENDDAYOFWEEK",type=string,JSONPath=`.spec.endDayOfWeek`,priority=0
 // +kubebuilder:printcolumn:name="MINPODS",type=integer,JSONPath=`.spec.minReplicas`,priority=1
 // +kubebuilder:printcolumn:name="MAXPODS",type=integer,JSONPath=`.spec.maxReplicas`,priority=1
-// +kubebuilder:printcolumn:name="STATUS",type=string,JSONPath=`.status.phase`,priority=0
+// +kubebuilder:printcolumn:name="STATUS",type=string,JSONPath=`.status.condition`,priority=0
 // +kubebuilder:printcolumn:name="AGE",type="date",JSONPath=`.metadata.creationTimestamp`,priority=0
 
 // Schedule is the Schema for the schedules API.

@@ -81,7 +81,9 @@ func (r *ScheduleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	}
 
 	if schedule.Spec.Suspend {
-		if updated := setScheduleSuspendStatus(&schedule); updated {
+		if schedule.Status.Condition != autoscalingv1.ScheduleSuspend {
+			setScheduleCondition(&schedule.Status, autoscalingv1.ScheduleSuspend)
+
 			r.Recorder.Event(&schedule, corev1.EventTypeNormal, "Updated", "The schedule was updated.")
 
 			if err := r.Status().Update(ctx, &schedule); err != nil {
@@ -94,7 +96,9 @@ func (r *ScheduleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, nil
 	}
 
-	if updated := setScheduleAvailableStatus(&schedule); updated {
+	if schedule.Status.Condition != autoscalingv1.ScheduleAvailable {
+		setScheduleCondition(&schedule.Status, autoscalingv1.ScheduleAvailable)
+
 		r.Recorder.Event(&schedule, corev1.EventTypeNormal, "Updated", "The schedule was updated.")
 
 		if err := r.Status().Update(ctx, &schedule); err != nil {
@@ -107,68 +111,13 @@ func (r *ScheduleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	return ctrl.Result{}, nil
 }
 
-func setScheduleSuspendStatus(schedule *autoscalingv1.Schedule) bool {
-	updated := false
-
-	currentSuspendCond := findCondition(schedule.Status.Conditions, string(autoscalingv1.ScheduleSuspend))
-	if currentSuspendCond == nil || currentSuspendCond.Status != autoscalingv1.ConditionTrue {
-		setCondition(&schedule.Status.Conditions, autoscalingv1.Condition{
-			Type:    string(autoscalingv1.ScheduleSuspend),
-			Status:  autoscalingv1.ConditionTrue,
-			Reason:  "SuspendScheduling",
-			Message: "Suspend to scheduled scheduling.",
-		})
-
-		schedule.Status.Phase = autoscalingv1.ScheduleSuspend
-
-		updated = true
+func setScheduleCondition(status *autoscalingv1.ScheduleStatus, newCondition autoscalingv1.ScheduleConditionType) {
+	if status.Condition == newCondition {
+		return
 	}
 
-	currentAvailableCond := findCondition(schedule.Status.Conditions, string(autoscalingv1.ScheduleAvailable))
-	if currentAvailableCond == nil || currentAvailableCond.Status != autoscalingv1.ConditionFalse {
-		setCondition(&schedule.Status.Conditions, autoscalingv1.Condition{
-			Type:    string(autoscalingv1.ScheduleAvailable),
-			Status:  autoscalingv1.ConditionFalse,
-			Reason:  "SuspendScheduling",
-			Message: "Suspend to scheduled scheduling.",
-		})
-
-		updated = true
-	}
-
-	return updated
-}
-
-func setScheduleAvailableStatus(schedule *autoscalingv1.Schedule) bool {
-	updated := false
-
-	currentAvailableCond := findCondition(schedule.Status.Conditions, string(autoscalingv1.ScheduleAvailable))
-	if currentAvailableCond == nil || currentAvailableCond.Status != autoscalingv1.ConditionTrue {
-		setCondition(&schedule.Status.Conditions, autoscalingv1.Condition{
-			Type:    string(autoscalingv1.ScheduleAvailable),
-			Status:  autoscalingv1.ConditionTrue,
-			Reason:  "SchedulingAvailable",
-			Message: "Available to scheduled scheduling.",
-		})
-
-		schedule.Status.Phase = autoscalingv1.ScheduleAvailable
-
-		updated = true
-	}
-
-	currentSuspendCond := findCondition(schedule.Status.Conditions, string(autoscalingv1.ScheduleSuspend))
-	if currentSuspendCond == nil || currentSuspendCond.Status != autoscalingv1.ConditionFalse {
-		setCondition(&schedule.Status.Conditions, autoscalingv1.Condition{
-			Type:    string(autoscalingv1.ScheduleSuspend),
-			Status:  autoscalingv1.ConditionFalse,
-			Reason:  "SchedulingAvailable",
-			Message: "Available to scheduled scheduling.",
-		})
-
-		updated = true
-	}
-
-	return updated
+	status.Condition = newCondition
+	status.LastTransitionTime = metav1.Now()
 }
 
 func (r *ScheduleReconciler) SetupWithManager(mgr ctrl.Manager) error {

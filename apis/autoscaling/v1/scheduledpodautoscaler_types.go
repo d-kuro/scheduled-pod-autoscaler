@@ -34,38 +34,16 @@ type ScheduledPodAutoscalerSpec struct {
 	HorizontalPodAutoscalerSpec autoscalingv2beta2.HorizontalPodAutoscalerSpec `json:"horizontalPodAutoscalerSpec"`
 }
 
-type ScheduledPodAutoscalerConditionType string
-
-const (
-	AvailableScheduledPodAutoscalerCondition ScheduledPodAutoscalerConditionType = "Available"
-)
-
-type ScheduledPodAutoscalerStatusType string
-
-const (
-	AvailableScheduledPodAutoscalerStatus   ScheduledPodAutoscalerStatusType = "Available"
-	UnavailableScheduledPodAutoscalerStatus ScheduledPodAutoscalerStatusType = "Unavailable"
-)
-
 // ScheduledPodAutoscalerStatus defines the observed state of ScheduledPodAutoscaler.
 type ScheduledPodAutoscalerStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
-
-	// Conditions is an array of conditions.
-	// +optional
-	Conditions []Condition `json:"conditions,omitempty"`
-
-	// Phase is schedule status type.
-	// +optional
-	Phase ScheduledPodAutoscalerStatusType `json:"phase,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // +kubebuilder:printcolumn:name="MINPODS",type=integer,JSONPath=`.spec.horizontalPodAutoscalerSpec.minReplicas`,priority=0
 // +kubebuilder:printcolumn:name="MAXPODS",type=integer,JSONPath=`.spec.horizontalPodAutoscalerSpec.maxReplicas`,priority=0
-// +kubebuilder:printcolumn:name="STATUS",type=string,JSONPath=`.status.phase`,priority=0
 // +kubebuilder:printcolumn:name="AGE",type="date",JSONPath=".metadata.creationTimestamp",priority=0
 
 // ScheduledPodAutoscaler is the Schema for the scheduledpodautoscalers API.

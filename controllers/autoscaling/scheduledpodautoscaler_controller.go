@@ -196,8 +196,10 @@ func indexByOwnerScheduledPodAutoscaler(obj runtime.Object) []string {
 }
 
 func (r *ScheduledPodAutoscalerReconciler) SetupWithManager(mgr ctrl.Manager) error {
+	ctx := context.Background()
+
 	err := mgr.GetFieldIndexer().
-		IndexField(&autoscalingv1.Schedule{}, ownerControllerField, indexByOwnerScheduledPodAutoscaler)
+		IndexField(ctx, &autoscalingv1.Schedule{}, ownerControllerField, indexByOwnerScheduledPodAutoscaler)
 	if err != nil {
 		return err
 	}

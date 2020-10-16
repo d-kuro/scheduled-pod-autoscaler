@@ -12,12 +12,6 @@ spec:
   - JSONPath: .spec.scaleTargetRef.name
     name: REFERENCE
     type: string
-  - JSONPath: .spec.minReplicas
-    name: MINPODS
-    type: integer
-  - JSONPath: .spec.maxReplicas
-    name: MAXPODS
-    type: integer
   - JSONPath: .spec.startTime
     name: STARTTIME
     type: string
@@ -30,9 +24,20 @@ spec:
   - JSONPath: .spec.endDayOfWeek
     name: ENDDAYOFWEEK
     type: string
+  - JSONPath: .spec.minReplicas
+    name: MINPODS
+    priority: 1
+    type: integer
+  - JSONPath: .spec.maxReplicas
+    name: MAXPODS
+    priority: 1
+    type: integer
   - JSONPath: .spec.suspend
     name: SUSPEND
     type: string
+  - JSONPath: .metadata.creationTimestamp
+    name: AGE
+    type: date
   group: autoscaling.d-kuro.github.io
   names:
     kind: Schedule

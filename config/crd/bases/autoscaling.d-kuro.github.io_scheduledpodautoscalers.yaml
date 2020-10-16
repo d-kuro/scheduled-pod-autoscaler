@@ -15,6 +15,9 @@ spec:
   - JSONPath: .spec.horizontalPodAutoscalerSpec.maxReplicas
     name: MAXPODS
     type: integer
+  - JSONPath: .metadata.creationTimestamp
+    name: AGE
+    type: date
   group: autoscaling.d-kuro.github.io
   names:
     kind: ScheduledPodAutoscaler

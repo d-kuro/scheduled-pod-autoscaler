@@ -94,14 +94,15 @@ type ScheduleStatus struct {
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
-// +kubebuilder:printcolumn:name="REFERENCE",type=string,JSONPath=`.spec.scaleTargetRef.name`
-// +kubebuilder:printcolumn:name="MINPODS",type=integer,JSONPath=`.spec.minReplicas`
-// +kubebuilder:printcolumn:name="MAXPODS",type=integer,JSONPath=`.spec.maxReplicas`
-// +kubebuilder:printcolumn:name="STARTTIME",type=string,JSONPath=`.spec.startTime`
-// +kubebuilder:printcolumn:name="STARTDAYOFWEEK",type=string,JSONPath=`.spec.startDayOfWeek`
-// +kubebuilder:printcolumn:name="ENDTIME",type=string,JSONPath=`.spec.endTime`
-// +kubebuilder:printcolumn:name="ENDDAYOFWEEK",type=string,JSONPath=`.spec.endDayOfWeek`
-// +kubebuilder:printcolumn:name="SUSPEND",type=string,JSONPath=`.spec.suspend`
+// +kubebuilder:printcolumn:name="REFERENCE",type=string,JSONPath=`.spec.scaleTargetRef.name`,priority=0
+// +kubebuilder:printcolumn:name="STARTTIME",type=string,JSONPath=`.spec.startTime`,priority=0
+// +kubebuilder:printcolumn:name="STARTDAYOFWEEK",type=string,JSONPath=`.spec.startDayOfWeek`,priority=0
+// +kubebuilder:printcolumn:name="ENDTIME",type=string,JSONPath=`.spec.endTime`,priority=0
+// +kubebuilder:printcolumn:name="ENDDAYOFWEEK",type=string,JSONPath=`.spec.endDayOfWeek`,priority=0
+// +kubebuilder:printcolumn:name="MINPODS",type=integer,JSONPath=`.spec.minReplicas`,priority=1
+// +kubebuilder:printcolumn:name="MAXPODS",type=integer,JSONPath=`.spec.maxReplicas`,priority=1
+// +kubebuilder:printcolumn:name="SUSPEND",type=string,JSONPath=`.spec.suspend`,priority=0
+// +kubebuilder:printcolumn:name="AGE",type="date",JSONPath=".metadata.creationTimestamp",priority=0
 
 // Schedule is the Schema for the schedules API.
 type Schedule struct {

@@ -75,18 +75,18 @@ func (s *ScheduleSpec) normalizeTime(now time.Time, location *time.Location) (no
 }
 
 func (s *ScheduleSpec) normalizeWeekday(startTime time.Time) (
-	time.Weekday, time.Weekday, time.Weekday, error) {
+	weekdayToday time.Weekday, startWeekDay time.Weekday, endWeekDay time.Weekday, err error) {
 	startWeekDay, found := weekdays[s.StartDayOfWeek]
 	if !found {
 		return 0, 0, 0, fmt.Errorf("start-day-of-week %s is not found", s.StartDayOfWeek)
 	}
 
-	endWeekDay, found := weekdays[s.EndDayOfWeek]
+	endWeekDay, found = weekdays[s.EndDayOfWeek]
 	if !found {
 		return 0, 0, 0, fmt.Errorf("end-day-of-week %s is invalid", s.EndDayOfWeek)
 	}
 
-	weekdayToday := startTime.Weekday()
+	weekdayToday = startTime.Weekday()
 	if startWeekDay > endWeekDay {
 		// normalize weekday
 		endWeekDay = 7 - startWeekDay + endWeekDay

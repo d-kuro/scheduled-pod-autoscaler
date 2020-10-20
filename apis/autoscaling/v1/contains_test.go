@@ -257,19 +257,19 @@ func TestScheduleSpecContains(t *testing.T) {
 		// everyday
 		{
 			name:     "everyday[1]",
-			spec:     ScheduleSpec{StartDayOfWeek: "Monday", EndDayOfWeek: "Sunday", StartTime: "15:00", EndTime: "01:30"},
+			spec:     ScheduleSpec{StartDayOfWeek: "Sunday", EndDayOfWeek: "Saturday", StartTime: "15:00", EndTime: "01:30"},
 			now:      time.Date(2018, 9, 3, 1, 20, 0, 0, time.UTC),
 			expected: true,
 		},
 		{
 			name:     "everyday[2]",
-			spec:     ScheduleSpec{StartDayOfWeek: "Monday", EndDayOfWeek: "Sunday", StartTime: "15:00", EndTime: "01:30"},
+			spec:     ScheduleSpec{StartDayOfWeek: "Sunday", EndDayOfWeek: "Saturday", StartTime: "15:00", EndTime: "01:30"},
 			now:      time.Date(2018, 9, 3, 16, 00, 0, 0, time.UTC),
 			expected: true,
 		},
 		{
 			name:     "everyday[3]",
-			spec:     ScheduleSpec{StartDayOfWeek: "Monday", EndDayOfWeek: "Sunday", StartTime: "15:00", EndTime: "01:30"},
+			spec:     ScheduleSpec{StartDayOfWeek: "Sunday", EndDayOfWeek: "Saturday", StartTime: "15:00", EndTime: "01:30"},
 			now:      time.Date(2018, 9, 5, 1, 20, 0, 0, time.UTC),
 			expected: true,
 		},

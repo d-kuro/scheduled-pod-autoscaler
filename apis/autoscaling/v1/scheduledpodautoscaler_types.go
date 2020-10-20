@@ -34,16 +34,35 @@ type ScheduledPodAutoscalerSpec struct {
 	HorizontalPodAutoscalerSpec autoscalingv2beta2.HorizontalPodAutoscalerSpec `json:"horizontalPodAutoscalerSpec"`
 }
 
+type ScheduledPodAutoscalerConditionType string
+
+const (
+	ScheduledPodAutoscalerAvailable ScheduledPodAutoscalerConditionType = "Available"
+	ScheduledPodAutoscalerDegraded  ScheduledPodAutoscalerConditionType = "Degraded"
+)
+
 // ScheduledPodAutoscalerStatus defines the observed state of ScheduledPodAutoscaler.
 type ScheduledPodAutoscalerStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+
+	// LastTransitionTime is the last time the condition transitioned from one status to another.
+	// +kubebuilder:validation:Type=string
+	// +kubebuilder:validation:Format=date-time
+	// +optional
+	LastTransitionTime metav1.Time `json:"lastTransitionTime"`
+
+	// Condition is schedule status type.
+	// +optional
+	Condition ScheduledPodAutoscalerConditionType `json:"condition,omitempty"`
 }
 
 // +kubebuilder:object:root=true
+// +kubebuilder:resource:shortName=spa
 // +kubebuilder:subresource:status
 // +kubebuilder:printcolumn:name="MINPODS",type=integer,JSONPath=`.spec.horizontalPodAutoscalerSpec.minReplicas`,priority=0
 // +kubebuilder:printcolumn:name="MAXPODS",type=integer,JSONPath=`.spec.horizontalPodAutoscalerSpec.maxReplicas`,priority=0
+// +kubebuilder:printcolumn:name="STATUS",type=string,JSONPath=`.status.condition`,priority=0
 // +kubebuilder:printcolumn:name="AGE",type="date",JSONPath=".metadata.creationTimestamp",priority=0
 
 // ScheduledPodAutoscaler is the Schema for the scheduledpodautoscalers API.

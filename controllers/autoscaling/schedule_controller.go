@@ -82,13 +82,7 @@ func (r *ScheduleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	if schedule.Spec.Suspend {
 		if schedule.Status.Condition != autoscalingv1.ScheduleSuspend {
-			setScheduleCondition(&schedule.Status, autoscalingv1.ScheduleSuspend)
-
-			r.Recorder.Event(&schedule, corev1.EventTypeNormal, "Updated", "The schedule was updated.")
-
-			if err := r.Status().Update(ctx, &schedule); err != nil {
-				log.Error(err, "unable to update schedule status", "schedule", schedule)
-
+			if err := r.updateScheduleStatus(ctx, log, schedule, autoscalingv1.ScheduleSuspend); err != nil {
 				return ctrl.Result{}, err
 			}
 		}
@@ -96,14 +90,8 @@ func (r *ScheduleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, nil
 	}
 
-	if schedule.Status.Condition != autoscalingv1.ScheduleAvailable {
-		setScheduleCondition(&schedule.Status, autoscalingv1.ScheduleAvailable)
-
-		r.Recorder.Event(&schedule, corev1.EventTypeNormal, "Updated", "The schedule was updated.")
-
-		if err := r.Status().Update(ctx, &schedule); err != nil {
-			log.Error(err, "unable to update schedule status", "schedule", schedule)
-
+	if schedule.Status.Condition == autoscalingv1.ScheduleSuspend {
+		if err := r.updateScheduleStatus(ctx, log, schedule, autoscalingv1.ScheduleAvailable); err != nil {
 			return ctrl.Result{}, err
 		}
 	}
@@ -111,13 +99,33 @@ func (r *ScheduleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	return ctrl.Result{}, nil
 }
 
-func setScheduleCondition(status *autoscalingv1.ScheduleStatus, newCondition autoscalingv1.ScheduleConditionType) {
+func (r *ScheduleReconciler) updateScheduleStatus(ctx context.Context, log logr.Logger,
+	schedule autoscalingv1.Schedule, newCondition autoscalingv1.ScheduleConditionType) error {
+	if updated := setScheduleCondition(&schedule.Status, newCondition); updated {
+		r.Recorder.Event(&schedule, corev1.EventTypeNormal, "Updated", "The schedule was updated.")
+
+		if err := r.Status().Update(ctx, &schedule); err != nil {
+			log.Error(err, "unable to update schedule status", "schedule", schedule)
+
+			return err
+		}
+	}
+
+	return nil
+}
+
+func setScheduleCondition(status *autoscalingv1.ScheduleStatus, newCondition autoscalingv1.ScheduleConditionType) bool {
+	updated := false
+
 	if status.Condition == newCondition {
-		return
+		return updated
 	}
 
 	status.Condition = newCondition
 	status.LastTransitionTime = metav1.Now()
+	updated = true
+
+	return updated
 }
 
 func (r *ScheduleReconciler) SetupWithManager(mgr ctrl.Manager) error {

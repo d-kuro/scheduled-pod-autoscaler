@@ -69,9 +69,10 @@ func main() {
 	}
 
 	if err = (&autoscalingcontroller.ScheduledPodAutoscalerReconciler{
-		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("ScheduledPodAutoscaler"),
-		Scheme: mgr.GetScheme(),
+		Client:   mgr.GetClient(),
+		Log:      ctrl.Log.WithName("controllers").WithName("ScheduledPodAutoscaler"),
+		Scheme:   mgr.GetScheme(),
+		Recorder: mgr.GetEventRecorderFor("scheduledpodautoscaler-controller"),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "ScheduledPodAutoscaler")
 		os.Exit(1)

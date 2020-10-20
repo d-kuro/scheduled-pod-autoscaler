@@ -15,6 +15,9 @@ spec:
   - JSONPath: .spec.horizontalPodAutoscalerSpec.maxReplicas
     name: MAXPODS
     type: integer
+  - JSONPath: .status.condition
+    name: STATUS
+    type: string
   - JSONPath: .metadata.creationTimestamp
     name: AGE
     type: date
@@ -23,6 +26,8 @@ spec:
     kind: ScheduledPodAutoscaler
     listKind: ScheduledPodAutoscalerList
     plural: scheduledpodautoscalers
+    shortNames:
+    - spa
     singular: scheduledpodautoscaler
   scope: Namespaced
   subresources:
@@ -592,6 +597,15 @@ spec:
         status:
           description: ScheduledPodAutoscalerStatus defines the observed state of
             ScheduledPodAutoscaler.
+          properties:
+            condition:
+              description: Condition is schedule status type.
+              type: string
+            lastTransitionTime:
+              description: LastTransitionTime is the last time the condition transitioned
+                from one status to another.
+              format: date-time
+              type: string
           type: object
       type: object
   version: v1

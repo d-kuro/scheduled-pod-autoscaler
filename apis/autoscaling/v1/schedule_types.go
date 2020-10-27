@@ -98,10 +98,10 @@ type ScheduleSpec struct {
 type ScheduleType string
 
 const (
-	TypeMonthly ScheduleType = "Monthly"
-	TypeWeekly  ScheduleType = "Weekly"
-	TypeDaily   ScheduleType = "Daily"
-	TypeOneShot ScheduleType = "OneShot"
+	Monthly ScheduleType = "Monthly"
+	Weekly  ScheduleType = "Weekly"
+	Daily   ScheduleType = "Daily"
+	OneShot ScheduleType = "OneShot"
 )
 
 type ScheduleConditionType string

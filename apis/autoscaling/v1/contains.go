@@ -27,13 +27,13 @@ func (s *ScheduleSpec) Contains(now time.Time) (bool, error) {
 	now = now.In(location)
 
 	switch s.ScheduleType {
-	case TypeDaily:
+	case Daily:
 		return s.containsDaily(now, location)
-	case TypeWeekly:
+	case Weekly:
 		return s.containsWeekly(now, location)
-	case TypeMonthly:
+	case Monthly:
 		return s.containsMonthly(now, location)
-	case TypeOneShot:
+	case OneShot:
 		return s.containsOneShot(now, location)
 	default:
 		return false, fmt.Errorf("unsupported schedule types: %s", s.ScheduleType)

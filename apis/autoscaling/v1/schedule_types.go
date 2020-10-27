@@ -82,11 +82,15 @@ type ScheduleSpec struct {
 	// +optional
 	EndDayOfWeek string `json:"endDayOfWeek"`
 
-	// StartTime is scaling start time.
+	// StartTime is scaling start time. Defined in RFC3339 based format.
+	// Different formats are evaluated depending on ScheduleType.
+	// e.g. OneShot(yyyy-MM-ddTHH:mm), Monthly(MM-ddTHH:mm), Weekly(HH:mm), Daily(HH:mm)
 	// +kubebuiler:validation:Required
 	StartTime string `json:"startTime"`
 
-	// EndTime is scaling end time.
+	// EndTime is scaling end time. Defined in RFC3339 based format.
+	// Different formats are evaluated depending on ScheduleType.
+	// e.g. OneShot(yyyy-MM-ddTHH:mm), Monthly(MM-ddTHH:mm), Weekly(HH:mm), Daily(HH:mm)
 	// +kubebuiler:validation:Required
 	EndTime string `json:"endTime"`
 }
@@ -131,6 +135,8 @@ type ScheduleStatus struct {
 // +kubebuilder:printcolumn:name="TYPE",type=string,JSONPath=`.spec.type`,priority=0
 // +kubebuilder:printcolumn:name="STARTTIME",type=string,JSONPath=`.spec.startTime`,priority=0
 // +kubebuilder:printcolumn:name="ENDTIME",type=string,JSONPath=`.spec.endTime`,priority=0
+// +kubebuilder:printcolumn:name="STARTDAYOFWEEK",type=string,JSONPath=`.spec.startDayOfWeek`,priority=0
+// +kubebuilder:printcolumn:name="ENDDAYOFWEEK",type=string,JSONPath=`.spec.endDayOfWeek`,priority=0
 // +kubebuilder:printcolumn:name="MINPODS",type=integer,JSONPath=`.spec.minReplicas`,priority=1
 // +kubebuilder:printcolumn:name="MAXPODS",type=integer,JSONPath=`.spec.maxReplicas`,priority=1
 // +kubebuilder:printcolumn:name="STATUS",type=string,JSONPath=`.status.condition`,priority=0

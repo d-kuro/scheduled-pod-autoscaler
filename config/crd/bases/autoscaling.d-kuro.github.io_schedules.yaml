@@ -21,6 +21,12 @@ spec:
   - JSONPath: .spec.endTime
     name: ENDTIME
     type: string
+  - JSONPath: .spec.startDayOfWeek
+    name: STARTDAYOFWEEK
+    type: string
+  - JSONPath: .spec.endDayOfWeek
+    name: ENDDAYOFWEEK
+    type: string
   - JSONPath: .spec.minReplicas
     name: MINPODS
     priority: 1
@@ -189,7 +195,9 @@ spec:
               - Sunday
               type: string
             endTime:
-              description: EndTime is scaling end time.
+              description: EndTime is scaling end time. Defined in RFC3339 based format.
+                Different formats are evaluated depending on ScheduleType. e.g. OneShot(yyyy-MM-ddTHH:mm),
+                Monthly(MM-ddTHH:mm), Weekly(HH:mm), Daily(HH:mm)
               type: string
             maxReplicas:
               description: MaxReplicas is the upper limit for the number of replicas
@@ -599,7 +607,10 @@ spec:
               - Sunday
               type: string
             startTime:
-              description: StartTime is scaling start time.
+              description: StartTime is scaling start time. Defined in RFC3339 based
+                format. Different formats are evaluated depending on ScheduleType.
+                e.g. OneShot(yyyy-MM-ddTHH:mm), Monthly(MM-ddTHH:mm), Weekly(HH:mm),
+                Daily(HH:mm)
               type: string
             suspend:
               description: Suspend indicates whether to suspend this schedule.

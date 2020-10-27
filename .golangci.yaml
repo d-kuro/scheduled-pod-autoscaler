@@ -4,6 +4,7 @@ linters:
   enable-all: true
   disable:
     - dupl
+    - exhaustivestruct
     - funlen
     - gochecknoglobals
     - gochecknoinits
@@ -12,4 +13,5 @@ linters:
     - lll
     - maligned
     - testpackage
+    - wrapcheck
     - wsl

@@ -67,24 +67,56 @@ type ScheduleSpec struct {
 	// +optional
 	Behavior *autoscalingv2beta2.HorizontalPodAutoscalerBehavior `json:"behavior,omitempty"`
 
-	// StartDayOfWeek is scaling start day of week.
+	// ScheduleType is a type of schedule represented by Weekly,Daily,OneShot.
 	// +kubebuiler:validation:Required
+	// +kubebuilder:validation:Enum=Monthly;Weekly;Daily;OneShot
+	ScheduleType ScheduleType `json:"type"`
+
+	// StartYear is scaling start year.
+	// +optional
+	StartYear string `json:"startYear"`
+
+	// EndYear is scaling end year.
+	// +optional
+	EndYear string `json:"endYear"`
+
+	// StartDate is scaling start date.
+	// +optional
+	StartDate string `json:"startDate"`
+
+	// EndDate is scaling end date.
+	// +optional
+	EndDate string `json:"EndDate"`
+
+	// StartDayOfWeek is scaling start day of week.
 	// +kubebuilder:validation:Enum=Monday;Tuesday;Wednesday;Thursday;Friday;Saturday;Sunday
+	// +optional
 	StartDayOfWeek string `json:"startDayOfWeek"`
 
 	// EndDayOfWeek is scaling end day of week.
-	// +kubebuiler:validation:Required
 	// +kubebuilder:validation:Enum=Monday;Tuesday;Wednesday;Thursday;Friday;Saturday;Sunday
+	// +optional
 	EndDayOfWeek string `json:"endDayOfWeek"`
 
 	// StartTime is scaling start time.
+	// Specify the time in HH:mm format.
 	// +kubebuiler:validation:Required
 	StartTime string `json:"startTime"`
 
 	// EndTime is scaling end time.
+	// Specify the time in HH:mm format.
 	// +kubebuiler:validation:Required
 	EndTime string `json:"endTime"`
 }
+
+type ScheduleType string
+
+const (
+	TypeMonthly ScheduleType = "Monthly"
+	TypeWeekly  ScheduleType = "Weekly"
+	TypeDaily   ScheduleType = "Daily"
+	TypeOneShot ScheduleType = "OneShot"
+)
 
 type ScheduleConditionType string
 
@@ -114,10 +146,9 @@ type ScheduleStatus struct {
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // +kubebuilder:printcolumn:name="REFERENCE",type=string,JSONPath=`.spec.scaleTargetRef.name`,priority=0
+// +kubebuilder:printcolumn:name="TYPE",type=string,JSONPath=`.spec.type`,priority=0
 // +kubebuilder:printcolumn:name="STARTTIME",type=string,JSONPath=`.spec.startTime`,priority=0
-// +kubebuilder:printcolumn:name="STARTDAYOFWEEK",type=string,JSONPath=`.spec.startDayOfWeek`,priority=0
 // +kubebuilder:printcolumn:name="ENDTIME",type=string,JSONPath=`.spec.endTime`,priority=0
-// +kubebuilder:printcolumn:name="ENDDAYOFWEEK",type=string,JSONPath=`.spec.endDayOfWeek`,priority=0
 // +kubebuilder:printcolumn:name="MINPODS",type=integer,JSONPath=`.spec.minReplicas`,priority=1
 // +kubebuilder:printcolumn:name="MAXPODS",type=integer,JSONPath=`.spec.maxReplicas`,priority=1
 // +kubebuilder:printcolumn:name="STATUS",type=string,JSONPath=`.status.condition`,priority=0

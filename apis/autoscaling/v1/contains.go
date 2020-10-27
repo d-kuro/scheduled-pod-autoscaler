@@ -114,7 +114,11 @@ func (s *ScheduleSpec) normalizeDateTime(now time.Time, location *time.Location)
 		endTime.Hour(), endTime.Minute(), 0, 0, location)
 
 	if normalizedEndTime.Before(normalizedStartTime) {
-		normalizedEndTime = normalizedEndTime.AddDate(1, 0, 0)
+		if now.Before(normalizedStartTime) {
+			normalizedStartTime = normalizedStartTime.AddDate(-1, 0, 0)
+		} else {
+			normalizedEndTime = normalizedEndTime.AddDate(1, 0, 0)
+		}
 	}
 
 	return normalizedStartTime, normalizedEndTime, nil
@@ -140,7 +144,7 @@ func (s *ScheduleSpec) normalizeTime(now time.Time, location *time.Location) (no
 		endTime.Hour(), endTime.Minute(), 0, 0, location)
 
 	if normalizedEndTime.Before(normalizedStartTime) {
-		if now.Hour() <= endTime.Hour() && now.Minute() <= endTime.Minute() {
+		if now.Before(normalizedStartTime) {
 			normalizedStartTime = normalizedStartTime.AddDate(0, 0, -1)
 		} else {
 			normalizedEndTime = normalizedEndTime.AddDate(0, 0, 1)

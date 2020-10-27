@@ -12,17 +12,14 @@ spec:
   - JSONPath: .spec.scaleTargetRef.name
     name: REFERENCE
     type: string
+  - JSONPath: .spec.type
+    name: TYPE
+    type: string
   - JSONPath: .spec.startTime
     name: STARTTIME
     type: string
-  - JSONPath: .spec.startDayOfWeek
-    name: STARTDAYOFWEEK
-    type: string
   - JSONPath: .spec.endTime
     name: ENDTIME
-    type: string
-  - JSONPath: .spec.endDayOfWeek
-    name: ENDDAYOFWEEK
     type: string
   - JSONPath: .spec.minReplicas
     name: MINPODS
@@ -180,6 +177,10 @@ spec:
             description:
               description: Description is schedule description.
               type: string
+            endDate:
+              description: EndDate is scaling end date. Specify the date in MM-dd
+                format.
+              type: string
             endDayOfWeek:
               description: EndDayOfWeek is scaling end day of week.
               enum:
@@ -192,7 +193,11 @@ spec:
               - Sunday
               type: string
             endTime:
-              description: EndTime is scaling end time.
+              description: EndTime is scaling end time. Specify the time in HH:mm
+                format.
+              type: string
+            endYear:
+              description: EndYear is scaling end year. Specify the year in yyyy format.
               type: string
             maxReplicas:
               description: MaxReplicas is the upper limit for the number of replicas
@@ -590,6 +595,10 @@ spec:
               - kind
               - name
               type: object
+            startDate:
+              description: StartDate is scaling start date. Specify the date in MM-dd
+                format.
+              type: string
             startDayOfWeek:
               description: StartDayOfWeek is scaling start day of week.
               enum:
@@ -602,7 +611,12 @@ spec:
               - Sunday
               type: string
             startTime:
-              description: StartTime is scaling start time.
+              description: StartTime is scaling start time. Specify the time in HH:mm
+                format.
+              type: string
+            startYear:
+              description: StartYear is scaling start year. Specify the year in yyyy
+                format.
               type: string
             suspend:
               description: Suspend indicates whether to suspend this schedule.
@@ -613,12 +627,19 @@ spec:
                 are interpreted as the time in the time zone specified by TimeZoneName.
                 If not specified, the time will be interpreted as UTC.
               type: string
+            type:
+              description: ScheduleType is a type of schedule represented by Weekly,Daily,OneShot.
+              enum:
+              - Monthly
+              - Weekly
+              - Daily
+              - OneShot
+              type: string
           required:
-          - endDayOfWeek
           - endTime
           - scaleTargetRef
-          - startDayOfWeek
           - startTime
+          - type
           type: object
         status:
           description: ScheduleStatus defines the observed state of Schedule.

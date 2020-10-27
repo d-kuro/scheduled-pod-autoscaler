@@ -73,20 +73,24 @@ type ScheduleSpec struct {
 	ScheduleType ScheduleType `json:"type"`
 
 	// StartYear is scaling start year.
+	// Specify the year in yyyy format.
 	// +optional
 	StartYear string `json:"startYear"`
 
 	// EndYear is scaling end year.
+	// Specify the year in yyyy format.
 	// +optional
 	EndYear string `json:"endYear"`
 
 	// StartDate is scaling start date.
+	// Specify the date in MM-dd format.
 	// +optional
 	StartDate string `json:"startDate"`
 
 	// EndDate is scaling end date.
+	// Specify the date in MM-dd format.
 	// +optional
-	EndDate string `json:"EndDate"`
+	EndDate string `json:"endDate"`
 
 	// StartDayOfWeek is scaling start day of week.
 	// +kubebuilder:validation:Enum=Monday;Tuesday;Wednesday;Thursday;Friday;Saturday;Sunday

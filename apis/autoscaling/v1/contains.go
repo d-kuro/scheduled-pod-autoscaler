@@ -26,6 +26,27 @@ func (s *ScheduleSpec) Contains(now time.Time) (bool, error) {
 
 	now = now.In(location)
 
+	switch s.ScheduleType {
+	case TypeDaily:
+		return s.ContainsDaily(now, location)
+	case TypeWeekly:
+		return s.ContainsWeekly(now, location)
+	}
+
+	return false, nil
+}
+
+func (s *ScheduleSpec) ContainsDaily(now time.Time, location *time.Location) (bool, error) {
+	startTime, endTime, err := s.normalizeTime(now, location)
+	if err != nil {
+		return false, err
+	}
+
+	// true if now is [startTime, endTime)
+	return (now.Equal(startTime) || now.After(startTime)) && now.Before(endTime), nil
+}
+
+func (s *ScheduleSpec) ContainsWeekly(now time.Time, location *time.Location) (bool, error) {
 	startTime, endTime, err := s.normalizeTime(now, location)
 	if err != nil {
 		return false, err
@@ -42,6 +63,57 @@ func (s *ScheduleSpec) Contains(now time.Time) (bool, error) {
 	}
 
 	return false, nil
+}
+
+func (s *ScheduleSpec) ContainsMonthly(now time.Time, location *time.Location) (bool, error) {
+	startTime, endTime, err := s.normalizeDateTime(now, location)
+	if err != nil {
+		return false, err
+	}
+
+	// true if now is [startTime, endTime)
+	return (now.Equal(startTime) || now.After(startTime)) && now.Before(endTime), nil
+}
+
+func (s *ScheduleSpec) ContainsOneShot(now time.Time, location *time.Location) (bool, error) {
+	startTime, err := time.ParseInLocation("2006-01-02T15:04", s.StartTime, location)
+	if err != nil {
+		return false, fmt.Errorf("startTime cannot be parsed: %w", err)
+	}
+
+	endTime, err := time.ParseInLocation("2006-01-02T15:04", s.EndTime, location)
+	if err != nil {
+		return false, fmt.Errorf("endTime cannot be parsed: %w", err)
+	}
+
+	// true if now is [startTime, endTime)
+	return (now.Equal(startTime) || now.After(startTime)) && now.Before(endTime), nil
+}
+
+func (s *ScheduleSpec) normalizeDateTime(now time.Time, location *time.Location) (normalizedStartTime time.Time, normalizedEndTime time.Time, err error) {
+	startTime, err := time.ParseInLocation("01-02T15:04", s.StartTime, location)
+	if err != nil {
+		return time.Time{}, time.Time{}, fmt.Errorf("startTime cannot be parsed: %w", err)
+	}
+
+	endTime, err := time.ParseInLocation("01-02T15:04", s.EndTime, location)
+	if err != nil {
+		return time.Time{}, time.Time{}, fmt.Errorf("endTime cannot be parsed: %w", err)
+	}
+
+	normalizedStartTime = time.Date(
+		now.Year(), startTime.Month(), startTime.Day(),
+		startTime.Hour(), startTime.Minute(), 0, 0, location)
+
+	normalizedEndTime = time.Date(
+		now.Year(), endTime.Month(), endTime.Day(),
+		endTime.Hour(), endTime.Minute(), 0, 0, location)
+
+	if normalizedEndTime.Before(normalizedStartTime) {
+		normalizedEndTime = normalizedEndTime.AddDate(1, 0, 0)
+	}
+
+	return normalizedStartTime, normalizedEndTime, nil
 }
 
 func (s *ScheduleSpec) normalizeTime(now time.Time, location *time.Location) (normalizedStartTime time.Time, normalizedEndTime time.Time, err error) {

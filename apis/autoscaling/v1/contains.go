@@ -28,19 +28,19 @@ func (s *ScheduleSpec) Contains(now time.Time) (bool, error) {
 
 	switch s.ScheduleType {
 	case TypeDaily:
-		return s.ContainsDaily(now, location)
+		return s.containsDaily(now, location)
 	case TypeWeekly:
-		return s.ContainsWeekly(now, location)
+		return s.containsWeekly(now, location)
 	case TypeMonthly:
-		return s.ContainsMonthly(now, location)
+		return s.containsMonthly(now, location)
 	case TypeOneShot:
-		return s.ContainsOneShot(now, location)
+		return s.containsOneShot(now, location)
 	default:
 		return false, fmt.Errorf("unsupported schedule types: %s", s.ScheduleType)
 	}
 }
 
-func (s *ScheduleSpec) ContainsDaily(now time.Time, location *time.Location) (bool, error) {
+func (s *ScheduleSpec) containsDaily(now time.Time, location *time.Location) (bool, error) {
 	startTime, endTime, err := s.normalizeTime(now, location)
 	if err != nil {
 		return false, err
@@ -50,7 +50,7 @@ func (s *ScheduleSpec) ContainsDaily(now time.Time, location *time.Location) (bo
 	return (now.Equal(startTime) || now.After(startTime)) && now.Before(endTime), nil
 }
 
-func (s *ScheduleSpec) ContainsWeekly(now time.Time, location *time.Location) (bool, error) {
+func (s *ScheduleSpec) containsWeekly(now time.Time, location *time.Location) (bool, error) {
 	startTime, endTime, err := s.normalizeTime(now, location)
 	if err != nil {
 		return false, err
@@ -69,7 +69,7 @@ func (s *ScheduleSpec) ContainsWeekly(now time.Time, location *time.Location) (b
 	return false, nil
 }
 
-func (s *ScheduleSpec) ContainsMonthly(now time.Time, location *time.Location) (bool, error) {
+func (s *ScheduleSpec) containsMonthly(now time.Time, location *time.Location) (bool, error) {
 	startTime, endTime, err := s.normalizeDateTime(now, location)
 	if err != nil {
 		return false, err
@@ -79,7 +79,7 @@ func (s *ScheduleSpec) ContainsMonthly(now time.Time, location *time.Location) (
 	return (now.Equal(startTime) || now.After(startTime)) && now.Before(endTime), nil
 }
 
-func (s *ScheduleSpec) ContainsOneShot(now time.Time, location *time.Location) (bool, error) {
+func (s *ScheduleSpec) containsOneShot(now time.Time, location *time.Location) (bool, error) {
 	startTime, err := time.ParseInLocation("2006-01-02T15:04", s.StartTime, location)
 	if err != nil {
 		return false, fmt.Errorf("startTime cannot be parsed: %w", err)

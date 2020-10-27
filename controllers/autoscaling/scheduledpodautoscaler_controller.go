@@ -125,7 +125,7 @@ func (r *ScheduledPodAutoscalerReconciler) reconcileSchedule(ctx context.Context
 		}
 
 		if isContains {
-			updated, err = r.updateSchedule(ctx, log, schedule, hpa)
+			updated, err = r.updateHPA(ctx, log, schedule, hpa)
 			if err != nil {
 				return updated, err
 			}
@@ -170,7 +170,7 @@ func (r *ScheduledPodAutoscalerReconciler) createHPA(ctx context.Context, log lo
 	return nil
 }
 
-func (r *ScheduledPodAutoscalerReconciler) updateSchedule(ctx context.Context, log logr.Logger,
+func (r *ScheduledPodAutoscalerReconciler) updateHPA(ctx context.Context, log logr.Logger,
 	schedule autoscalingv1.Schedule, hpa hpav2beta2.HorizontalPodAutoscaler) (bool, error) {
 	updated := false
 

@@ -18,7 +18,6 @@ package controllers
 
 import (
 	"context"
-	"sort"
 	"time"
 
 	autoscalingv1 "github.com/d-kuro/scheduled-pod-autoscaler/apis/autoscaling/v1"
@@ -105,10 +104,10 @@ func (r *ScheduledPodAutoscalerReconciler) reconcileSchedule(ctx context.Context
 		return false, err
 	}
 
-	sortSchedules(schedules.Items, log)
-
 	now := time.Now()
 	updated := false
+
+	var processSchedule []autoscalingv1.Schedule
 
 	for _, schedule := range schedules.Items {
 		schedule := schedule
@@ -125,15 +124,37 @@ func (r *ScheduledPodAutoscalerReconciler) reconcileSchedule(ctx context.Context
 		}
 
 		if isContains {
-			updated, err = r.updateHPA(ctx, log, schedule, hpa)
-			if err != nil {
-				return updated, err
-			}
+			processSchedule = append(processSchedule, schedule)
 
 			continue
 		}
 
 		if err = r.updateScheduleStatus(ctx, log, schedule, autoscalingv1.ScheduleAvailable); err != nil {
+			log.Error(err, "unable to update schedule status", "schedule", schedule)
+		}
+	}
+
+	newMin, newMax := calculateHPAReplica(processSchedule)
+
+	if newMin != nil {
+		hpa.Spec.MinReplicas = newMin
+	}
+
+	if newMax != nil {
+		hpa.Spec.MaxReplicas = *newMax
+	}
+
+	updated, err := r.updateHPA(ctx, log, hpa)
+	if err != nil {
+		for _, schedule := range processSchedule {
+			if err = r.updateScheduleStatus(ctx, log, schedule, autoscalingv1.ScheduleDegraded); err != nil {
+				log.Error(err, "unable to update schedule status", "schedule", schedule)
+			}
+		}
+	}
+
+	for _, schedule := range processSchedule {
+		if err := r.updateScheduleStatus(ctx, log, schedule, autoscalingv1.ScheduleProgressing); err != nil {
 			log.Error(err, "unable to update schedule status", "schedule", schedule)
 		}
 	}
@@ -171,37 +192,17 @@ func (r *ScheduledPodAutoscalerReconciler) createHPA(ctx context.Context, log lo
 }
 
 func (r *ScheduledPodAutoscalerReconciler) updateHPA(ctx context.Context, log logr.Logger,
-	schedule autoscalingv1.Schedule, hpa hpav2beta2.HorizontalPodAutoscaler) (bool, error) {
+	hpa hpav2beta2.HorizontalPodAutoscaler) (bool, error) {
 	updated := false
-
-	if schedule.Spec.MaxReplicas != nil {
-		hpa.Spec.MaxReplicas = *schedule.Spec.MaxReplicas
-	}
-
-	if schedule.Spec.MinReplicas != nil {
-		hpa.Spec.MinReplicas = schedule.Spec.MinReplicas
-	}
-
-	if schedule.Spec.Metrics != nil {
-		hpa.Spec.Metrics = schedule.Spec.Metrics
-	}
 
 	if err := r.Update(ctx, &hpa, &client.UpdateOptions{}); err != nil {
 		log.Error(err, "unable to update HPA", "hpa", hpa)
-
-		if err = r.updateScheduleStatus(ctx, log, schedule, autoscalingv1.ScheduleDegraded); err != nil {
-			log.Error(err, "unable to update schedule status", "schedule", schedule)
-		}
 
 		return updated, err
 	}
 
 	updated = true
 	log.Info("successfully update HPA", "hpa", hpa)
-
-	if err := r.updateScheduleStatus(ctx, log, schedule, autoscalingv1.ScheduleProgressing); err != nil {
-		log.Error(err, "unable to update schedule status", "schedule", schedule)
-	}
 
 	return updated, nil
 }
@@ -237,6 +238,31 @@ func (r *ScheduledPodAutoscalerReconciler) updateScheduledPodAutoscalerStatus(ct
 	return nil
 }
 
+// calculateHPAReplica calculates minReplicas and maxReplicas of the HPA from one or more schedules.
+// If there is more than one schedule, the maximum value is used for the replicas.
+func calculateHPAReplica(schedules []autoscalingv1.Schedule) (minReplicas *int32, maxReplicas *int32) {
+	var max, min int32
+	for _, schedule := range schedules {
+		if schedule.Spec.MinReplicas != nil && *schedule.Spec.MinReplicas > min {
+			min = *schedule.Spec.MinReplicas
+		}
+
+		if schedule.Spec.MaxReplicas != nil && *schedule.Spec.MaxReplicas > max {
+			max = *schedule.Spec.MaxReplicas
+		}
+	}
+
+	if min > 0 {
+		minReplicas = &min
+	}
+
+	if max > 0 {
+		maxReplicas = &max
+	}
+
+	return minReplicas, maxReplicas
+}
+
 func setScheduledPodAutoscalerCondition(
 	status *autoscalingv1.ScheduledPodAutoscalerStatus,
 	newCondition autoscalingv1.ScheduledPodAutoscalerConditionType) bool {
@@ -251,33 +277,6 @@ func setScheduledPodAutoscalerCondition(
 	updated = true
 
 	return updated
-}
-
-// sortSchedules sorts the schedule slice.
-// Sort by start day of week.
-// If the start day of week are the same. sort by start time.
-func sortSchedules(schedules []autoscalingv1.Schedule, log logr.Logger) {
-	sort.SliceStable(schedules, func(i, j int) bool {
-		if schedules[i].Spec.StartDayOfWeek == schedules[j].Spec.StartDayOfWeek {
-			startTime1, err := time.Parse("15:04", schedules[i].Spec.StartTime)
-			if err != nil {
-				log.Error(err, "unable to parse start time", "schedule", schedules[i])
-
-				return false
-			}
-
-			startTime2, err := time.Parse("15:04", schedules[j].Spec.StartTime)
-			if err != nil {
-				log.Error(err, "unable to parse start time", "schedule", schedules[j])
-
-				return false
-			}
-
-			return startTime1.Unix() < startTime2.Unix()
-		}
-
-		return schedules[i].Spec.StartDayOfWeek < schedules[j].Spec.StartDayOfWeek
-	})
 }
 
 const ownerControllerField = ".metadata.controller"

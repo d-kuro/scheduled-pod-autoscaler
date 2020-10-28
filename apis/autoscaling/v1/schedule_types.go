@@ -59,14 +59,6 @@ type ScheduleSpec struct {
 	// +optional
 	MaxReplicas *int32 `json:"maxReplicas,omitempty"`
 
-	// Metrics contains the specifications for which to use to calculate the desired replica count.
-	// +optional
-	Metrics []autoscalingv2beta2.MetricSpec `json:"metrics,omitempty"`
-
-	// Behavior configures the scaling behavior of the target in both Up and Down directions.
-	// +optional
-	Behavior *autoscalingv2beta2.HorizontalPodAutoscalerBehavior `json:"behavior,omitempty"`
-
 	// ScheduleType is a type of schedule represented by Weekly,Daily,OneShot.
 	// +kubebuiler:validation:Required
 	// +kubebuilder:validation:Enum=Monthly;Weekly;Daily;OneShot

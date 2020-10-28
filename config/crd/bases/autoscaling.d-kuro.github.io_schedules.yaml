@@ -615,10 +615,10 @@ spec:
             suspend:
               description: Suspend indicates whether to suspend this schedule.
               type: boolean
-            timeZoneName:
-              description: TimeZoneName is the name of the timezone used in the argument
+            timeZone:
+              description: TimeZone is the name of the timezone used in the argument
                 of the time.LoadLocation(name string) function. StartTime and EndTime
-                are interpreted as the time in the time zone specified by TimeZoneName.
+                are interpreted as the time in the time zone specified by TimeZone.
                 If not specified, the time will be interpreted as UTC.
               type: string
             type:

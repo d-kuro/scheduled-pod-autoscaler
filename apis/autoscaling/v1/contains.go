@@ -19,9 +19,9 @@ var weekdays = map[string]time.Weekday{
 }
 
 func (s *ScheduleSpec) Contains(now time.Time) (bool, error) {
-	location, err := time.LoadLocation(s.TimeZoneName)
+	location, err := time.LoadLocation(s.TimeZone)
 	if err != nil {
-		return false, fmt.Errorf("failed to load location %s: %w", s.TimeZoneName, err)
+		return false, fmt.Errorf("failed to load location %s: %w", s.TimeZone, err)
 	}
 
 	now = now.In(location)

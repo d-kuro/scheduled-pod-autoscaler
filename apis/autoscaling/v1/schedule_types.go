@@ -42,11 +42,11 @@ type ScheduleSpec struct {
 	// +optional
 	Description string `json:"description,omitempty"`
 
-	// TimeZoneName is the name of the timezone used in the argument of the time.LoadLocation(name string) function.
-	// StartTime and EndTime are interpreted as the time in the time zone specified by TimeZoneName.
+	// TimeZone is the name of the timezone used in the argument of the time.LoadLocation(name string) function.
+	// StartTime and EndTime are interpreted as the time in the time zone specified by TimeZone.
 	// If not specified, the time will be interpreted as UTC.
 	// +optional
-	TimeZoneName string `json:"timeZoneName,omitempty"`
+	TimeZone string `json:"timeZone,omitempty"`
 
 	// MinReplicas is the lower limit for the number of replicas to which the autoscaler can scale down.
 	// It defaults to 1 pod.

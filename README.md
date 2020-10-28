@@ -1,6 +1,6 @@
 # scheduled-pod-autoscaler
 
-GitOps Native Schedule Scaling of Kubernetes Resources.
+**Work in Progress** GitOps Native Schedule Scaling of Kubernetes Resources.
 
 ## Overview
 

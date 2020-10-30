@@ -98,6 +98,8 @@ func (r *ScheduledPodAutoscalerReconciler) Reconcile(req ctrl.Request) (ctrl.Res
 
 func (r *ScheduledPodAutoscalerReconciler) reconcileSchedule(ctx context.Context, log logr.Logger,
 	spa autoscalingv1.ScheduledPodAutoscaler, hpa hpav2beta2.HorizontalPodAutoscaler) (bool, error) {
+	now := time.Now()
+	updated := false
 	var err error
 
 	var schedules autoscalingv1.ScheduleList
@@ -107,15 +109,27 @@ func (r *ScheduledPodAutoscalerReconciler) reconcileSchedule(ctx context.Context
 		return false, err
 	}
 
-	now := time.Now()
-	updated := false
-
 	var processSchedule []autoscalingv1.Schedule
 
 	for _, schedule := range schedules.Items {
 		schedule := schedule
 
 		if schedule.Spec.Suspend {
+			continue
+		}
+
+		completed, err := schedule.Spec.IsCompleted(now)
+		if err != nil {
+			log.Error(err, "unable to check completed Schedule")
+
+			return updated, err
+		}
+
+		if completed {
+			if err = r.updateScheduleStatus(ctx, log, schedule, autoscalingv1.ScheduleCompleted); err != nil {
+				log.Error(err, "unable to update schedule status", "schedule", schedule)
+			}
+
 			continue
 		}
 
@@ -148,13 +162,15 @@ func (r *ScheduledPodAutoscalerReconciler) reconcileSchedule(ctx context.Context
 		newHPA.Spec.MaxReplicas = *newMax
 	}
 
-	if !equality.Semantic.DeepEqual(hpa, newHPA) {
-		updated, err = r.updateHPA(ctx, log, *newHPA)
-		if err != nil {
-			for _, schedule := range processSchedule {
-				if err = r.updateScheduleStatus(ctx, log, schedule, autoscalingv1.ScheduleDegraded); err != nil {
-					log.Error(err, "unable to update schedule status", "schedule", schedule)
-				}
+	if equality.Semantic.DeepEqual(hpa, newHPA) {
+		return updated, nil
+	}
+
+	updated, err = r.updateHPA(ctx, log, *newHPA)
+	if err != nil {
+		for _, schedule := range processSchedule {
+			if err = r.updateScheduleStatus(ctx, log, schedule, autoscalingv1.ScheduleDegraded); err != nil {
+				log.Error(err, "unable to update schedule status", "schedule", schedule)
 			}
 		}
 	}

@@ -17,6 +17,8 @@ limitations under the License.
 package v1
 
 import (
+	"time"
+
 	autoscalingv2beta2 "k8s.io/api/autoscaling/v2beta2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -103,7 +105,21 @@ const (
 	ScheduleSuspend     ScheduleConditionType = "Suspend"
 	ScheduleProgressing ScheduleConditionType = "Progressing"
 	ScheduleDegraded    ScheduleConditionType = "Degraded"
+	ScheduleCompleted   ScheduleConditionType = "Completed"
 )
+
+func (s ScheduleSpec) IsCompleted(now time.Time) (bool, error) {
+	if s.ScheduleType != OneShot {
+		return false, nil
+	}
+
+	endTime, err := time.Parse("2006-01-02T15:04", s.EndTime)
+	if err != nil {
+		return false, err
+	}
+
+	return endTime.UTC().After(now.UTC()), nil
+}
 
 // ScheduleStatus defines the observed state of Schedule.
 type ScheduleStatus struct {

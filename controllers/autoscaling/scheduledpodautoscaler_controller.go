@@ -24,6 +24,7 @@ import (
 	"github.com/go-logr/logr"
 	hpav2beta2 "k8s.io/api/autoscaling/v2beta2"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/equality"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -97,6 +98,8 @@ func (r *ScheduledPodAutoscalerReconciler) Reconcile(req ctrl.Request) (ctrl.Res
 
 func (r *ScheduledPodAutoscalerReconciler) reconcileSchedule(ctx context.Context, log logr.Logger,
 	spa autoscalingv1.ScheduledPodAutoscaler, hpa hpav2beta2.HorizontalPodAutoscaler) (bool, error) {
+	var err error
+
 	var schedules autoscalingv1.ScheduleList
 	if err := r.List(ctx, &schedules, client.MatchingFields(map[string]string{ownerControllerField: spa.Name})); err != nil {
 		log.Error(err, "unable to list child Schedules")
@@ -135,20 +138,23 @@ func (r *ScheduledPodAutoscalerReconciler) reconcileSchedule(ctx context.Context
 	}
 
 	newMin, newMax := calculateHPAReplica(processSchedule)
+	newHPA := hpa.DeepCopy()
 
 	if newMin != nil {
-		hpa.Spec.MinReplicas = newMin
+		newHPA.Spec.MinReplicas = newMin
 	}
 
 	if newMax != nil {
-		hpa.Spec.MaxReplicas = *newMax
+		newHPA.Spec.MaxReplicas = *newMax
 	}
 
-	updated, err := r.updateHPA(ctx, log, hpa)
-	if err != nil {
-		for _, schedule := range processSchedule {
-			if err = r.updateScheduleStatus(ctx, log, schedule, autoscalingv1.ScheduleDegraded); err != nil {
-				log.Error(err, "unable to update schedule status", "schedule", schedule)
+	if !equality.Semantic.DeepEqual(hpa, newHPA) {
+		updated, err = r.updateHPA(ctx, log, *newHPA)
+		if err != nil {
+			for _, schedule := range processSchedule {
+				if err = r.updateScheduleStatus(ctx, log, schedule, autoscalingv1.ScheduleDegraded); err != nil {
+					log.Error(err, "unable to update schedule status", "schedule", schedule)
+				}
 			}
 		}
 	}

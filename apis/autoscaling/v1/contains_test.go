@@ -66,26 +66,26 @@ func TestScheduleSpecContainsMonthly(t *testing.T) {
 	}{
 		{
 			name:     "case[1]",
-			spec:     ScheduleSpec{ScheduleType: Monthly, StartTime: "09-01T10:00", EndTime: "09-10T19:00"},
+			spec:     ScheduleSpec{ScheduleType: Monthly, StartTime: "01T10:00", EndTime: "10T19:00"},
 			now:      time.Date(2018, 9, 10, 11, 00, 0, 0, time.UTC),
 			expected: true,
 		},
 		{
 			name:     "case[2]",
-			spec:     ScheduleSpec{ScheduleType: Monthly, StartTime: "09-01T10:00", EndTime: "09-05T19:00"},
+			spec:     ScheduleSpec{ScheduleType: Monthly, StartTime: "01T10:00", EndTime: "05T19:00"},
 			now:      time.Date(2018, 9, 10, 20, 00, 0, 0, time.UTC),
 			expected: false,
 		},
 		{
-			name:     "year changes case[1]",
-			spec:     ScheduleSpec{ScheduleType: Monthly, StartTime: "12-01T10:00", EndTime: "01-01T10:00"},
-			now:      time.Date(2018, 1, 1, 02, 00, 0, 0, time.UTC),
+			name:     "month changes case[1]",
+			spec:     ScheduleSpec{ScheduleType: Monthly, StartTime: "31T00:00", EndTime: "10T10:00"},
+			now:      time.Date(2018, 2, 5, 02, 00, 0, 0, time.UTC),
 			expected: true,
 		},
 		{
-			name:     "year changes case[2]",
-			spec:     ScheduleSpec{ScheduleType: Monthly, StartTime: "12-01T10:00", EndTime: "01-01T10:00"},
-			now:      time.Date(2018, 1, 2, 02, 00, 0, 0, time.UTC),
+			name:     "month changes case[2]",
+			spec:     ScheduleSpec{ScheduleType: Monthly, StartTime: "31T10:00", EndTime: "01T10:00"},
+			now:      time.Date(2018, 3, 2, 02, 00, 0, 0, time.UTC),
 			expected: false,
 		},
 	}

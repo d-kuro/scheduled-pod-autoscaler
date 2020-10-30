@@ -95,22 +95,22 @@ func (s *ScheduleSpec) containsOneShot(now time.Time, location *time.Location) (
 }
 
 func (s *ScheduleSpec) normalizeDateTime(now time.Time, location *time.Location) (normalizedStartTime time.Time, normalizedEndTime time.Time, err error) {
-	startTime, err := time.ParseInLocation("01-02T15:04", s.StartTime, location)
+	startTime, err := time.ParseInLocation("02T15:04", s.StartTime, location)
 	if err != nil {
 		return time.Time{}, time.Time{}, fmt.Errorf("startTime cannot be parsed: %w", err)
 	}
 
-	endTime, err := time.ParseInLocation("01-02T15:04", s.EndTime, location)
+	endTime, err := time.ParseInLocation("02T15:04", s.EndTime, location)
 	if err != nil {
 		return time.Time{}, time.Time{}, fmt.Errorf("endTime cannot be parsed: %w", err)
 	}
 
 	normalizedStartTime = time.Date(
-		now.Year(), startTime.Month(), startTime.Day(),
+		now.Year(), now.Month(), startTime.Day(),
 		startTime.Hour(), startTime.Minute(), 0, 0, location)
 
 	normalizedEndTime = time.Date(
-		now.Year(), endTime.Month(), endTime.Day(),
+		now.Year(), now.Month(), endTime.Day(),
 		endTime.Hour(), endTime.Minute(), 0, 0, location)
 
 	if normalizedEndTime.Before(normalizedStartTime) {

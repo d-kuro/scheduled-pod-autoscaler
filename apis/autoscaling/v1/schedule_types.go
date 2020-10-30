@@ -78,7 +78,7 @@ type ScheduleSpec struct {
 
 	// StartTime is scaling start time. Defined in RFC3339 based format.
 	// Different formats are evaluated depending on ScheduleType.
-	// e.g. OneShot(yyyy-MM-ddTHH:mm), Monthly(MM-ddTHH:mm), Weekly(HH:mm), Daily(HH:mm)
+	// e.g. OneShot(yyyy-MM-ddTHH:mm), Monthly(ddTHH:mm), Weekly(HH:mm), Daily(HH:mm)
 	// +kubebuiler:validation:Required
 	StartTime string `json:"startTime"`
 

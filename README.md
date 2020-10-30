@@ -68,7 +68,7 @@ rewrites `HorizontalPodAutoscaler` created by `ScheduledPodAutoscaler` when it i
 
 #### type: Monthly
 
-Write the time in the format of `MM-ddTHH:mm`.
+Write the time in the format of `ddTHH:mm`.
 
 ```yaml
 apiVersion: autoscaling.d-kuro.github.io/v1
@@ -83,8 +83,8 @@ spec:
   minReplicas: 10
   maxReplicas: 20
   type: Monthly
-  startTime: "09-01T09:50"
-  endTime: "09-10T19:00"
+  startTime: "01T09:50"
+  endTime: "10T19:00"
   timeZone: Asia/Tokyo
 ```
 

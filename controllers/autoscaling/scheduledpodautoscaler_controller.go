@@ -51,9 +51,13 @@ func (r *ScheduledPodAutoscalerReconciler) Reconcile(req ctrl.Request) (ctrl.Res
 
 	var spa autoscalingv1.ScheduledPodAutoscaler
 	if err := r.Get(ctx, req.NamespacedName, &spa); err != nil {
+		if apierrors.IsNotFound(err) {
+			return ctrl.Result{}, client.IgnoreNotFound(err)
+		}
+
 		log.Error(err, "unable to fetch ScheduledPodAutoscaler")
 
-		return ctrl.Result{}, client.IgnoreNotFound(err)
+		return ctrl.Result{}, err
 	}
 
 	var hpa hpav2beta2.HorizontalPodAutoscaler

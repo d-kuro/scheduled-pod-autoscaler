@@ -117,7 +117,7 @@ func (s ScheduleSpec) IsCompleted(now time.Time) (bool, error) {
 		return false, err
 	}
 
-	return endTime.UTC().After(now.UTC()), nil
+	return now.UTC().After(endTime.UTC()), nil
 }
 
 // ScheduleStatus defines the observed state of Schedule.

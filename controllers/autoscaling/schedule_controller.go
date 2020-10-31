@@ -22,6 +22,7 @@ import (
 	autoscalingv1 "github.com/d-kuro/scheduled-pod-autoscaler/apis/autoscaling/v1"
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
@@ -47,9 +48,13 @@ func (r *ScheduleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	var schedule autoscalingv1.Schedule
 	if err := r.Get(ctx, req.NamespacedName, &schedule); err != nil {
+		if apierrors.IsNotFound(err) {
+			return ctrl.Result{}, client.IgnoreNotFound(err)
+		}
+
 		log.Error(err, "unable to fetch Schedule")
 
-		return ctrl.Result{}, client.IgnoreNotFound(err)
+		return ctrl.Result{}, err
 	}
 
 	namespacedName := types.NamespacedName{

@@ -64,7 +64,8 @@ func (r *ScheduledPodAutoscalerReconciler) Reconcile(req ctrl.Request) (ctrl.Res
 	if err := r.Get(ctx, req.NamespacedName, &hpa); apierrors.IsNotFound(err) {
 		log.Info("unable to fetch hpa, try to create one", "namespacedName", req.NamespacedName)
 
-		if err := r.createHPA(ctx, log, spa); err != nil {
+		hpa, err = r.createHPA(ctx, log, spa)
+		if err != nil {
 			return ctrl.Result{}, err
 		}
 
@@ -189,7 +190,7 @@ func (r *ScheduledPodAutoscalerReconciler) reconcileSchedule(ctx context.Context
 }
 
 func (r *ScheduledPodAutoscalerReconciler) createHPA(ctx context.Context, log logr.Logger,
-	spa autoscalingv1.ScheduledPodAutoscaler) error {
+	spa autoscalingv1.ScheduledPodAutoscaler) (hpav2beta2.HorizontalPodAutoscaler, error) {
 	hpa := hpav2beta2.HorizontalPodAutoscaler{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      spa.Name,
@@ -201,7 +202,7 @@ func (r *ScheduledPodAutoscalerReconciler) createHPA(ctx context.Context, log lo
 	if err := ctrl.SetControllerReference(&spa, &hpa, r.Scheme); err != nil {
 		log.Error(err, "unable to set ownerReference", "hpa", hpa)
 
-		return err
+		return hpav2beta2.HorizontalPodAutoscaler{}, err
 	}
 
 	if err := r.Create(ctx, &hpa, &client.CreateOptions{}); err != nil {
@@ -211,10 +212,10 @@ func (r *ScheduledPodAutoscalerReconciler) createHPA(ctx context.Context, log lo
 			log.Error(err, "unable to update ScheduledPodAutoscaler status", "scheduledPodAutoscaler", spa)
 		}
 
-		return err
+		return hpav2beta2.HorizontalPodAutoscaler{}, err
 	}
 
-	return nil
+	return hpa, nil
 }
 
 func (r *ScheduledPodAutoscalerReconciler) updateHPA(ctx context.Context, log logr.Logger,

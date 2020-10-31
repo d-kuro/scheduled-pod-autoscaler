@@ -82,6 +82,7 @@ spec:
               - Friday
               - Saturday
               - Sunday
+              - ""
               type: string
             endTime:
               description: EndTime is scaling end time. Defined in RFC3339 based format.
@@ -128,6 +129,7 @@ spec:
               - Friday
               - Saturday
               - Sunday
+              - ""
               type: string
             startTime:
               description: StartTime is scaling start time. Defined in RFC3339 based

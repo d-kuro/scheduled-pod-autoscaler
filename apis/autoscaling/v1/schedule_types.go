@@ -67,12 +67,12 @@ type ScheduleSpec struct {
 	ScheduleType ScheduleType `json:"type"`
 
 	// StartDayOfWeek is scaling start day of week.
-	// +kubebuilder:validation:Enum=Monday;Tuesday;Wednesday;Thursday;Friday;Saturday;Sunday
+	// +kubebuilder:validation:Enum=Monday;Tuesday;Wednesday;Thursday;Friday;Saturday;Sunday;""
 	// +optional
 	StartDayOfWeek string `json:"startDayOfWeek"`
 
 	// EndDayOfWeek is scaling end day of week.
-	// +kubebuilder:validation:Enum=Monday;Tuesday;Wednesday;Thursday;Friday;Saturday;Sunday
+	// +kubebuilder:validation:Enum=Monday;Tuesday;Wednesday;Thursday;Friday;Saturday;Sunday;""
 	// +optional
 	EndDayOfWeek string `json:"endDayOfWeek"`
 

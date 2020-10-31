@@ -112,12 +112,12 @@ func (s ScheduleSpec) IsCompleted(now time.Time) (bool, error) {
 		return false, nil
 	}
 
-	endTime, err := time.Parse("2006-01-02T15:04", s.EndTime)
+	endTime, err := time.ParseInLocation("2006-01-02T15:04", s.EndTime, now.Location())
 	if err != nil {
 		return false, err
 	}
 
-	return now.UTC().After(endTime.UTC()), nil
+	return now.After(endTime), nil
 }
 
 // ScheduleStatus defines the observed state of Schedule.

@@ -36,5 +36,7 @@ jobs:
           # move to a long-term location and put it on your path
           # (you'll need to set the KUBEBUILDER_ASSETS env var if you put it somewhere else)
           sudo mv /tmp/kubebuilder_2.3.1_${os}_${arch} /usr/local/kubebuilder
+      - name: Install tools
+        run: cat tools/tools.go | awk -F'"' '/_/ {print $2}' | xargs -tI {} go install {}
       - name: Run tests
         run: make test

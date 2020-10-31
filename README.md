@@ -66,28 +66,6 @@ rewrites `HorizontalPodAutoscaler` created by `ScheduledPodAutoscaler` when it i
 
 `Schedule` supports 4 different schedule types.
 
-#### type: Monthly
-
-Write the time in the format of `ddTHH:mm`.
-
-```yaml
-apiVersion: autoscaling.d-kuro.github.io/v1
-kind: Schedule
-metadata:
-  name: api-push-notification
-spec:
-  scaleTargetRef:
-    apiVersion: autoscaling.d-kuro.github.io/v1
-    kind: ScheduledPodAutoscaler
-    name: api
-  minReplicas: 10
-  maxReplicas: 20
-  type: Monthly
-  startTime: "01T09:50"
-  endTime: "10T19:00"
-  timeZone: Asia/Tokyo
-```
-
 #### type: Weekly
 
 Write the time in the format of `HH:mm` and specify the day of the week.

@@ -57,58 +57,6 @@ func TestScheduleSpecContainsDaily(t *testing.T) {
 	}
 }
 
-func TestScheduleSpecContainsMonthly(t *testing.T) {
-	tests := []struct {
-		name     string
-		spec     ScheduleSpec
-		now      time.Time
-		expected bool
-	}{
-		{
-			name:     "case[1]",
-			spec:     ScheduleSpec{ScheduleType: Monthly, StartTime: "01T10:00", EndTime: "10T19:00"},
-			now:      time.Date(2018, 9, 10, 11, 00, 0, 0, time.UTC),
-			expected: true,
-		},
-		{
-			name:     "case[2]",
-			spec:     ScheduleSpec{ScheduleType: Monthly, StartTime: "01T10:00", EndTime: "05T19:00"},
-			now:      time.Date(2018, 9, 10, 20, 00, 0, 0, time.UTC),
-			expected: false,
-		},
-		{
-			name:     "month changes case[1]",
-			spec:     ScheduleSpec{ScheduleType: Monthly, StartTime: "31T00:00", EndTime: "10T10:00"},
-			now:      time.Date(2018, 2, 5, 02, 00, 0, 0, time.UTC),
-			expected: true,
-		},
-		{
-			name:     "month changes case[2]",
-			spec:     ScheduleSpec{ScheduleType: Monthly, StartTime: "31T10:00", EndTime: "01T10:00"},
-			now:      time.Date(2018, 3, 2, 02, 00, 0, 0, time.UTC),
-			expected: false,
-		},
-	}
-
-	for _, tt := range tests {
-		tt := tt
-		t.Run(tt.name, func(t *testing.T) {
-			contains, err := tt.spec.Contains(tt.now)
-			if err != nil {
-				t.Error(err)
-
-				return
-			}
-
-			if contains != tt.expected {
-				t.Errorf("%s is not expected condition. actual:%t expected:%t time: %s - %s",
-					tt.now, contains, tt.expected,
-					tt.spec.StartTime, tt.spec.EndTime)
-			}
-		})
-	}
-}
-
 func TestScheduleSpecContainsOneShot(t *testing.T) {
 	tests := []struct {
 		name     string

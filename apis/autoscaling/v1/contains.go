@@ -31,8 +31,6 @@ func (s *ScheduleSpec) Contains(now time.Time) (bool, error) {
 		return s.containsDaily(now, location)
 	case Weekly:
 		return s.containsWeekly(now, location)
-	case Monthly:
-		return s.containsMonthly(now, location)
 	case OneShot:
 		return s.containsOneShot(now, location)
 	default:
@@ -67,16 +65,6 @@ func (s *ScheduleSpec) containsWeekly(now time.Time, location *time.Location) (b
 	}
 
 	return false, nil
-}
-
-func (s *ScheduleSpec) containsMonthly(now time.Time, location *time.Location) (bool, error) {
-	startTime, endTime, err := s.normalizeDateTime(now, location)
-	if err != nil {
-		return false, err
-	}
-
-	// true if now is [startTime, endTime)
-	return (now.Equal(startTime) || now.After(startTime)) && now.Before(endTime), nil
 }
 
 func (s *ScheduleSpec) containsOneShot(now time.Time, location *time.Location) (bool, error) {

@@ -63,7 +63,7 @@ type ScheduleSpec struct {
 
 	// ScheduleType is a type of schedule represented by Weekly,Daily,OneShot.
 	// +kubebuiler:validation:Required
-	// +kubebuilder:validation:Enum=Monthly;Weekly;Daily;OneShot
+	// +kubebuilder:validation:Enum=Weekly;Daily;OneShot
 	ScheduleType ScheduleType `json:"type"`
 
 	// StartDayOfWeek is scaling start day of week.
@@ -78,13 +78,13 @@ type ScheduleSpec struct {
 
 	// StartTime is scaling start time. Defined in RFC3339 based format.
 	// Different formats are evaluated depending on ScheduleType.
-	// e.g. OneShot(yyyy-MM-ddTHH:mm), Monthly(ddTHH:mm), Weekly(HH:mm), Daily(HH:mm)
+	// e.g. OneShot(yyyy-MM-ddTHH:mm), Weekly(HH:mm), Daily(HH:mm)
 	// +kubebuiler:validation:Required
 	StartTime string `json:"startTime"`
 
 	// EndTime is scaling end time. Defined in RFC3339 based format.
 	// Different formats are evaluated depending on ScheduleType.
-	// e.g. OneShot(yyyy-MM-ddTHH:mm), Monthly(MM-ddTHH:mm), Weekly(HH:mm), Daily(HH:mm)
+	// e.g. OneShot(yyyy-MM-ddTHH:mm), Weekly(HH:mm), Daily(HH:mm)
 	// +kubebuiler:validation:Required
 	EndTime string `json:"endTime"`
 }
@@ -92,7 +92,6 @@ type ScheduleSpec struct {
 type ScheduleType string
 
 const (
-	Monthly ScheduleType = "Monthly"
 	Weekly  ScheduleType = "Weekly"
 	Daily   ScheduleType = "Daily"
 	OneShot ScheduleType = "OneShot"

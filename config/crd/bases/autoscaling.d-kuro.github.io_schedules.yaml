@@ -86,7 +86,7 @@ spec:
             endTime:
               description: EndTime is scaling end time. Defined in RFC3339 based format.
                 Different formats are evaluated depending on ScheduleType. e.g. OneShot(yyyy-MM-ddTHH:mm),
-                Monthly(MM-ddTHH:mm), Weekly(HH:mm), Daily(HH:mm)
+                Weekly(HH:mm), Daily(HH:mm)
               type: string
             maxReplicas:
               description: MaxReplicas is the upper limit for the number of replicas
@@ -132,8 +132,7 @@ spec:
             startTime:
               description: StartTime is scaling start time. Defined in RFC3339 based
                 format. Different formats are evaluated depending on ScheduleType.
-                e.g. OneShot(yyyy-MM-ddTHH:mm), Monthly(ddTHH:mm), Weekly(HH:mm),
-                Daily(HH:mm)
+                e.g. OneShot(yyyy-MM-ddTHH:mm), Weekly(HH:mm), Daily(HH:mm)
               type: string
             suspend:
               description: Suspend indicates whether to suspend this schedule.
@@ -147,7 +146,6 @@ spec:
             type:
               description: ScheduleType is a type of schedule represented by Weekly,Daily,OneShot.
               enum:
-              - Monthly
               - Weekly
               - Daily
               - OneShot

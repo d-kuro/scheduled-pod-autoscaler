@@ -19,8 +19,8 @@ var _ = ginkgo.Describe("ScheduledPodAutoscaler controller", func() {
 	ginkgo.Context("when creating ScheduledPodAutoscaler resource", func() {
 		ginkgo.It("should create HPA", func() {
 			const (
-				scheduleName = "scheduled-pod-autoscaler-test"
-				namespace    = "default"
+				name      = "scheduled-pod-autoscaler-test"
+				namespace = "default"
 			)
 
 			ctx := context.Background()
@@ -31,7 +31,7 @@ var _ = ginkgo.Describe("ScheduledPodAutoscaler controller", func() {
 					Kind:       "ScheduledPodAutoscaler",
 				},
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      scheduleName,
+					Name:      name,
 					Namespace: namespace,
 				},
 				Spec: autoscalingv1.ScheduledPodAutoscalerSpec{
@@ -39,7 +39,7 @@ var _ = ginkgo.Describe("ScheduledPodAutoscaler controller", func() {
 						ScaleTargetRef: hpav2beta2.CrossVersionObjectReference{
 							APIVersion: "apps/v1",
 							Kind:       "Deployment",
-							Name:       scheduleName,
+							Name:       name,
 						},
 						MinReplicas: testutil.ToPointerInt32(1),
 						MaxReplicas: 3,
@@ -66,7 +66,7 @@ var _ = ginkgo.Describe("ScheduledPodAutoscaler controller", func() {
 			var createdHPA hpav2beta2.HorizontalPodAutoscaler
 
 			gomega.Eventually(func() error {
-				if err := k8sClient.Get(ctx, client.ObjectKey{Name: scheduleName, Namespace: namespace}, &createdHPA); err != nil {
+				if err := k8sClient.Get(ctx, client.ObjectKey{Name: name, Namespace: namespace}, &createdHPA); err != nil {
 					return err
 				}
 
@@ -74,7 +74,7 @@ var _ = ginkgo.Describe("ScheduledPodAutoscaler controller", func() {
 					return fmt.Errorf("created HPA mismatch (-want +got):\\n%s", diff)
 				}
 
-				if err := k8sClient.Get(ctx, client.ObjectKey{Name: scheduleName, Namespace: namespace}, &createdSPA); err != nil {
+				if err := k8sClient.Get(ctx, client.ObjectKey{Name: name, Namespace: namespace}, &createdSPA); err != nil {
 					return err
 				}
 

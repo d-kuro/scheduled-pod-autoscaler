@@ -15,13 +15,13 @@ import (
 )
 
 var _ = ginkgo.Describe("Schedule controller", func() {
-	const (
-		scheduleName = "schedule-controller-test"
-		namespace    = "default"
-	)
-
 	ginkgo.Context("when creating Schedule resource", func() {
 		ginkgo.It("should set ownerReference", func() {
+			const (
+				name      = "schedule-controller-test"
+				namespace = "default"
+			)
+
 			ctx := context.Background()
 
 			spa := &autoscalingv1.ScheduledPodAutoscaler{
@@ -30,7 +30,7 @@ var _ = ginkgo.Describe("Schedule controller", func() {
 					Kind:       "ScheduledPodAutoscaler",
 				},
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      scheduleName,
+					Name:      name,
 					Namespace: namespace,
 				},
 				Spec: autoscalingv1.ScheduledPodAutoscalerSpec{
@@ -38,7 +38,7 @@ var _ = ginkgo.Describe("Schedule controller", func() {
 						ScaleTargetRef: hpav2beta2.CrossVersionObjectReference{
 							APIVersion: "apps/v1",
 							Kind:       "Deployment",
-							Name:       scheduleName,
+							Name:       name,
 						},
 						MinReplicas: testutil.ToPointerInt32(1),
 						MaxReplicas: 3,
@@ -52,14 +52,14 @@ var _ = ginkgo.Describe("Schedule controller", func() {
 					Kind:       "Schedule",
 				},
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      scheduleName,
+					Name:      name,
 					Namespace: namespace,
 				},
 				Spec: autoscalingv1.ScheduleSpec{
 					ScaleTargetRef: hpav2beta2.CrossVersionObjectReference{
 						APIVersion: "autoscaling.d-kuro.github.io/v1",
 						Kind:       "ScheduledPodAutoscaler",
-						Name:       scheduleName,
+						Name:       name,
 					},
 					ScheduleType: "Daily",
 					MinReplicas:  testutil.ToPointerInt32(5),
@@ -77,7 +77,7 @@ var _ = ginkgo.Describe("Schedule controller", func() {
 
 			var createdSchedule autoscalingv1.Schedule
 			gomega.Eventually(func() error {
-				if err := k8sClient.Get(ctx, client.ObjectKey{Name: scheduleName, Namespace: namespace}, &createdSchedule); err != nil {
+				if err := k8sClient.Get(ctx, client.ObjectKey{Name: name, Namespace: namespace}, &createdSchedule); err != nil {
 					return err
 				}
 

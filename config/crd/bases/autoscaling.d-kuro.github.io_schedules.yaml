@@ -4,7 +4,7 @@ apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.2.4
+    controller-gen.kubebuilder.io/version: v0.2.5
   creationTimestamp: null
   name: schedules.autoscaling.d-kuro.github.io
 spec:
@@ -55,14 +55,10 @@ spec:
       description: Schedule is the Schema for the schedules API.
       properties:
         apiVersion:
-          description: 'APIVersion defines the versioned schema of this representation
-            of an object. Servers should convert recognized schemas to the latest
-            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+          description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
           type: string
         kind:
-          description: 'Kind is a string value representing the REST resource this
-            object represents. Servers may infer this from the endpoint the client
-            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+          description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
           type: string
         metadata:
           type: object
@@ -85,26 +81,20 @@ spec:
               - ""
               type: string
             endTime:
-              description: EndTime is scaling end time. Defined in RFC3339 based format.
-                Different formats are evaluated depending on ScheduleType. e.g. OneShot(yyyy-MM-ddTHH:mm),
-                Weekly(HH:mm), Daily(HH:mm)
+              description: EndTime is scaling end time. Defined in RFC3339 based format. Different formats are evaluated depending on ScheduleType. e.g. OneShot(yyyy-MM-ddTHH:mm), Weekly(HH:mm), Daily(HH:mm)
               type: string
             maxReplicas:
-              description: MaxReplicas is the upper limit for the number of replicas
-                to which the autoscaler can scale up.
+              description: MaxReplicas is the upper limit for the number of replicas to which the autoscaler can scale up.
               format: int32
               minimum: 1
               type: integer
             minReplicas:
-              description: MinReplicas is the lower limit for the number of replicas
-                to which the autoscaler can scale down. It defaults to 1 pod.
+              description: MinReplicas is the lower limit for the number of replicas to which the autoscaler can scale down. It defaults to 1 pod.
               format: int32
               minimum: 1
               type: integer
             scaleTargetRef:
-              description: scaleTargetRef points to the target resource to scale,
-                and is used to the pods for which metrics should be collected, as
-                well as to actually change the replica count.
+              description: scaleTargetRef points to the target resource to scale, and is used to the pods for which metrics should be collected, as well as to actually change the replica count.
               properties:
                 apiVersion:
                   description: API version of the referent
@@ -132,18 +122,13 @@ spec:
               - ""
               type: string
             startTime:
-              description: StartTime is scaling start time. Defined in RFC3339 based
-                format. Different formats are evaluated depending on ScheduleType.
-                e.g. OneShot(yyyy-MM-ddTHH:mm), Weekly(HH:mm), Daily(HH:mm)
+              description: StartTime is scaling start time. Defined in RFC3339 based format. Different formats are evaluated depending on ScheduleType. e.g. OneShot(yyyy-MM-ddTHH:mm), Weekly(HH:mm), Daily(HH:mm)
               type: string
             suspend:
               description: Suspend indicates whether to suspend this schedule.
               type: boolean
             timeZone:
-              description: TimeZone is the name of the timezone used in the argument
-                of the time.LoadLocation(name string) function. StartTime and EndTime
-                are interpreted as the time in the time zone specified by TimeZone.
-                If not specified, the time will be interpreted as UTC.
+              description: TimeZone is the name of the timezone used in the argument of the time.LoadLocation(name string) function. StartTime and EndTime are interpreted as the time in the time zone specified by TimeZone. If not specified, the time will be interpreted as UTC.
               type: string
             type:
               description: ScheduleType is a type of schedule represented by Weekly,Daily,OneShot.
@@ -165,8 +150,7 @@ spec:
               description: Condition is schedule status type.
               type: string
             lastTransitionTime:
-              description: LastTransitionTime is the last time the condition transitioned
-                from one status to another.
+              description: LastTransitionTime is the last time the condition transitioned from one status to another.
               format: date-time
               type: string
           type: object

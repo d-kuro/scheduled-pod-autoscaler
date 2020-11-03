@@ -16,7 +16,7 @@ import (
 
 var _ = ginkgo.Describe("Schedule controller", func() {
 	const (
-		scheduleName = "test"
+		scheduleName = "schedule-controller-test"
 		namespace    = "default"
 	)
 

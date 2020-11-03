@@ -76,7 +76,7 @@ func (r *ScheduledPodAutoscalerReconciler) Reconcile(req ctrl.Request) (ctrl.Res
 		return ctrl.Result{}, err
 	}
 
-	updated, err := r.reconcileSchedule(ctx, log, spa, hpa)
+	updated, err := r.reconcileHPA(ctx, log, spa, hpa)
 	if err != nil {
 		log.Error(err, "unable to reconcile")
 
@@ -101,7 +101,7 @@ func (r *ScheduledPodAutoscalerReconciler) Reconcile(req ctrl.Request) (ctrl.Res
 	return ctrl.Result{Requeue: true, RequeueAfter: 30 * time.Second}, nil
 }
 
-func (r *ScheduledPodAutoscalerReconciler) reconcileSchedule(ctx context.Context, log logr.Logger,
+func (r *ScheduledPodAutoscalerReconciler) reconcileHPA(ctx context.Context, log logr.Logger,
 	spa autoscalingv1.ScheduledPodAutoscaler, hpa hpav2beta2.HorizontalPodAutoscaler) (bool, error) {
 	now := time.Now()
 	updated := false
@@ -111,7 +111,13 @@ func (r *ScheduledPodAutoscalerReconciler) reconcileSchedule(ctx context.Context
 	if err := r.List(ctx, &schedules, client.MatchingFields(map[string]string{ownerControllerField: spa.Name})); err != nil {
 		log.Error(err, "unable to list child Schedules")
 
-		return false, err
+		return updated, err
+	}
+
+	if len(schedules.Items) == 0 {
+		log.Error(err, "not found child Schedules")
+
+		return updated, nil
 	}
 
 	var processSchedule []autoscalingv1.Schedule

@@ -152,7 +152,7 @@ spec:
 
 | name | type | required | description |
 | - | - | - | - |
-| `.spec.horizontalPodAutoscalerSpec` | `Object` | required | HorizontalPodAutoscalerSpec is HorizontalPodAutoscaler v2beta2 API spec. |
+| `.spec.horizontalPodAutoscalerSpec` | `Object` | required | HorizontalPodAutoscalerSpec is HorizontalPodAutoscaler v2beta2 API spec. ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.19/#horizontalpodautoscaler-v2beta2-autoscaling |
 
 ### Schedule
 

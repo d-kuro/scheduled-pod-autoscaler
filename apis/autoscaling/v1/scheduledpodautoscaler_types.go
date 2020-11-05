@@ -30,6 +30,7 @@ type ScheduledPodAutoscalerSpec struct {
 	// Important: Run "make" to regenerate code after modifying this file
 
 	// HorizontalPodAutoscalerSpec is HorizontalPodAutoscaler v2beta2 API spec.
+	// ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.19/#horizontalpodautoscaler-v2beta2-autoscaling
 	// +kubebuilder:validation:Required
 	HorizontalPodAutoscalerSpec autoscalingv2beta2.HorizontalPodAutoscalerSpec `json:"horizontalPodAutoscalerSpec"`
 }

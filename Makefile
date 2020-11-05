@@ -108,4 +108,4 @@ generate-install-crd: controller-gen
 
 # generate crd for install (Kubernetes < v1.16)
 generate-install-crd-legacy: controller-gen-v3
-	$(CONTROLLER_GEN_V3) $(CRD_OPTIONS) paths="./..." output:crd:artifacts:config=manifests/crds/legacy
+	$(CONTROLLER_GEN_V3) $(CRD_OPTIONS) paths="./..." output:crd:artifacts:config=manifests/crd/legacy

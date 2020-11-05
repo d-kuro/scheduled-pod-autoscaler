@@ -102,7 +102,7 @@ generate-install: generate-install-crd generate-install-crd-legacy
 
 # generate crd for install
 generate-install-crd: controller-gen
-	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." \
+	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=scheduled-pod-autoscaler-role paths="./..." \
 	  output:crd:artifacts:config=manifests/crd \
 	  output:rbac:artifacts:config=manifests/rbac
 

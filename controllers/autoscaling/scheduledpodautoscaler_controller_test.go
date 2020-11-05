@@ -67,7 +67,7 @@ var _ = ginkgo.Describe("ScheduledPodAutoscaler controller", func() {
 			)
 
 			ctx := context.Background()
-			now := time.Now()
+			now := time.Now().UTC()
 			spa := newScheduledPodAutoscaler(name, namespace,
 				WithScheduledPodAutoscalerMinReplicas(scheduledPodAutoscalerMinReplicas),
 				WithScheduledPodAutoscalerMaxReplicas(scheduledPodAutoscalerMaxReplicas))

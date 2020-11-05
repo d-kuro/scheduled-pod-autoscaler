@@ -23,7 +23,7 @@ var _ = ginkgo.Describe("Schedule controller", func() {
 			)
 
 			ctx := context.Background()
-			now := time.Now()
+			now := time.Now().UTC()
 			spa := newScheduledPodAutoscaler(name, namespace)
 
 			// Set a future time and prevent it from being scheduled scaling

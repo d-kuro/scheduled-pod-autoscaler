@@ -99,8 +99,10 @@ endif
 
 # generate crd for install
 generate-install-crd: controller-gen
-	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=manifests/crds
+	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." \
+	  output:crd:artifacts:config=manifests/crd \
+	  output:rbac:artifacts:config=manifests/rbac
 
 # generate crd for install (Kubernetes < v1.16)
 generate-install-crd-legacy: controller-gen-v3
-	$(CONTROLLER_GEN_V3) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=manifests/crds/legacy
+	$(CONTROLLER_GEN_V3) $(CRD_OPTIONS) paths="./..." output:crd:artifacts:config=manifests/crds/legacy

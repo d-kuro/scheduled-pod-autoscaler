@@ -64,8 +64,6 @@ The `ScheduledPodAutoscaler` controller refers to the `Schedule` and
 rewrites `HorizontalPodAutoscaler` created by `ScheduledPodAutoscaler` when it is time for scheduled scaling.
 `HorizontalPodAutoscaler` is not managed in Git, so there is no diffs in GitOps.
 
-`Schedule` supports 4 different schedule types.
-
 ```console
 $ kubectl get schedule -o wide
 NAME     REFERENCE   TYPE      STARTTIME          ENDTIME            STARTDAYOFWEEK   ENDDAYOFWEEK   MINPODS   MAXPODS   STATUS      AGE
@@ -73,6 +71,8 @@ test-1   nginx       Weekly    20:10              20:15              Saturday   
 test-2   nginx       Daily     20:20              20:25                                              2         2         Available   4m49s
 test-3   nginx       OneShot   2020-10-31T20:30   2020-10-31T20:35                                   4         4         Completed   4m49s
 ```
+
+`Schedule` supports 4 different schedule types.
 
 #### type: Weekly
 

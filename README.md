@@ -64,6 +64,10 @@ The `ScheduledPodAutoscaler` controller refers to the `Schedule` and
 rewrites `HorizontalPodAutoscaler` created by `ScheduledPodAutoscaler` when it is time for scheduled scaling.
 `HorizontalPodAutoscaler` is not managed in Git, so there is no diffs in GitOps.
 
+> 📝 Note: A case of schedule conflicts
+>
+> In case of a schedule conflict, using the maximum value of min/max replicas.
+
 ```console
 $ kubectl get schedule -o wide
 NAME     REFERENCE   TYPE      STARTTIME          ENDTIME            STARTDAYOFWEEK   ENDDAYOFWEEK   MINPODS   MAXPODS   STATUS      AGE
@@ -168,7 +172,7 @@ spec:
 | `.spec.minReplicas` | `integer` | optional | MinReplicas is the lower limit for the number of replicas to which the autoscaler can scale down. It defaults to 1 pod. |
 | `.spec.maxReplicas` | `integer` | optional | MaxReplicas is the upper limit for the number of replicas to which the autoscaler can scale up. |
 | `.spec.type` | `string` | required | ScheduleType is a type of schedule represented by "Weekly","Daily","OneShot". |
-| `.spec.startDayOfWeek` | `string` | optional | StartDayOfWeek is scaling start day of week. |
-| `.spec.endDayOfWeek` | `string` | optional | EndDayOfWeek is scaling end day of week. |
+| `.spec.startDayOfWeek` | `string` | optional | StartDayOfWeek is scaling start day of week. Represented by "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday". |
+| `.spec.endDayOfWeek` | `string` | optional | EndDayOfWeek is scaling end day of week. Represented by "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday". |
 | `.spec.startTime` | `string` | required | StartTime is scaling start time. Defined in RFC3339 based format. Different formats are evaluated depending on ScheduleType. e.g. OneShot(yyyy-MM-ddTHH:mm), Weekly(HH:mm), Daily(HH:mm) |
 | `.spec.endTime` | `string` | required | EndTime is scaling end time. Defined in RFC3339 based format. Different formats are evaluated depending on ScheduleType. e.g. OneShot(yyyy-MM-ddTHH:mm), Weekly(HH:mm), Daily(HH:mm) |

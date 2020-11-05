@@ -61,18 +61,20 @@ type ScheduleSpec struct {
 	// +optional
 	MaxReplicas *int32 `json:"maxReplicas,omitempty"`
 
-	// ScheduleType is a type of schedule represented by "Weekly","Daily","OneShot".
+	// ScheduleType is a type of schedule represented by "Weekly", "Daily", "OneShot".
 	// +kubebuiler:validation:Required
 	// +kubebuilder:validation:Enum=Weekly;Daily;OneShot
 	ScheduleType ScheduleType `json:"type"`
 
 	// StartDayOfWeek is scaling start day of week.
-	// +kubebuilder:validation:Enum=Monday;Tuesday;Wednesday;Thursday;Friday;Saturday;Sunday;""
+	// Represented by "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday".
+	// +kubebuilder:validation:Enum=Sunday;Monday;Tuesday;Wednesday;Thursday;Friday;Saturday;""
 	// +optional
 	StartDayOfWeek string `json:"startDayOfWeek"`
 
 	// EndDayOfWeek is scaling end day of week.
-	// +kubebuilder:validation:Enum=Monday;Tuesday;Wednesday;Thursday;Friday;Saturday;Sunday;""
+	// Represented by "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday".
+	// +kubebuilder:validation:Enum=Sunday;Monday;Tuesday;Wednesday;Thursday;Friday;Saturday;""
 	// +optional
 	EndDayOfWeek string `json:"endDayOfWeek"`
 

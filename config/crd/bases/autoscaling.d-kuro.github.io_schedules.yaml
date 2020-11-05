@@ -69,15 +69,15 @@ spec:
               description: Description is schedule description.
               type: string
             endDayOfWeek:
-              description: EndDayOfWeek is scaling end day of week.
+              description: EndDayOfWeek is scaling end day of week. Represented by "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday".
               enum:
+              - Sunday
               - Monday
               - Tuesday
               - Wednesday
               - Thursday
               - Friday
               - Saturday
-              - Sunday
               - ""
               type: string
             endTime:
@@ -110,15 +110,15 @@ spec:
               - name
               type: object
             startDayOfWeek:
-              description: StartDayOfWeek is scaling start day of week.
+              description: StartDayOfWeek is scaling start day of week. Represented by "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday".
               enum:
+              - Sunday
               - Monday
               - Tuesday
               - Wednesday
               - Thursday
               - Friday
               - Saturday
-              - Sunday
               - ""
               type: string
             startTime:
@@ -131,7 +131,7 @@ spec:
               description: TimeZone is the name of the timezone used in the argument of the time.LoadLocation(name string) function. StartTime and EndTime are interpreted as the time in the time zone specified by TimeZone. If not specified, the time will be interpreted as UTC.
               type: string
             type:
-              description: ScheduleType is a type of schedule represented by "Weekly","Daily","OneShot".
+              description: ScheduleType is a type of schedule represented by "Weekly", "Daily", "OneShot".
               enum:
               - Weekly
               - Daily

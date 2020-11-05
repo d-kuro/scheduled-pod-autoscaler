@@ -79,6 +79,8 @@ else
 CONTROLLER_GEN=$(shell which controller-gen)
 endif
 
+# find or download controller-gen v0.3.0
+# used generate CRD for Kubernetes < v1.16
 controller-gen-v3:
 ifeq (, $(shell which controller-gen-v3))
 	@{ \
@@ -95,8 +97,10 @@ else
 CONTROLLER_GEN_V3=$(shell which controller-gen-v3)
 endif
 
+# generate crd for install
 generate-install-crd: controller-gen
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=manifests/crds
 
+# generate crd for install (Kubernetes < v1.16)
 generate-install-crd-legacy: controller-gen-v3
 	$(CONTROLLER_GEN_V3) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=manifests/crds/legacy

@@ -19,12 +19,11 @@ var _ = ginkgo.Describe("ScheduledPodAutoscaler controller", func() {
 	ginkgo.Context("when creating ScheduledPodAutoscaler resource", func() {
 		ginkgo.It("should create HPA", func() {
 			const (
-				name      = "create-hpa-test"
-				namespace = "default"
+				name = "create-hpa-test"
 			)
 
 			ctx := context.Background()
-			spa := newScheduledPodAutoscaler(name, namespace)
+			spa := newScheduledPodAutoscaler(name)
 
 			err := k8sClient.Create(ctx, spa)
 			gomega.Expect(err).Should(gomega.Succeed())
@@ -33,7 +32,7 @@ var _ = ginkgo.Describe("ScheduledPodAutoscaler controller", func() {
 			var createdHPA hpav2beta2.HorizontalPodAutoscaler
 
 			gomega.Eventually(func() error {
-				if err := k8sClient.Get(ctx, client.ObjectKey{Name: name, Namespace: namespace}, &createdHPA); err != nil {
+				if err := k8sClient.Get(ctx, client.ObjectKey{Name: name, Namespace: defaultTestNamespace}, &createdHPA); err != nil {
 					return err
 				}
 
@@ -41,7 +40,7 @@ var _ = ginkgo.Describe("ScheduledPodAutoscaler controller", func() {
 					return fmt.Errorf("created HPA mismatch (-want +got):\\n%s", diff)
 				}
 
-				if err := k8sClient.Get(ctx, client.ObjectKey{Name: name, Namespace: namespace}, &createdSPA); err != nil {
+				if err := k8sClient.Get(ctx, client.ObjectKey{Name: name, Namespace: defaultTestNamespace}, &createdSPA); err != nil {
 					return err
 				}
 
@@ -59,6 +58,70 @@ var _ = ginkgo.Describe("ScheduledPodAutoscaler controller", func() {
 		ginkgo.It("scheduled scaling works fine", func() {
 			const (
 				name                              = "scheduled-scaling-test"
+				scheduledPodAutoscalerMinReplicas = 1
+				scheduledPodAutoscalerMaxReplicas = 3
+				scheduleMinReplicas               = 5
+				scheduleMaxReplicas               = 10
+			)
+
+			ctx := context.Background()
+			now := time.Now().UTC()
+			spa := newScheduledPodAutoscaler(name,
+				WithScheduledPodAutoscalerMinReplicas(scheduledPodAutoscalerMinReplicas),
+				WithScheduledPodAutoscalerMaxReplicas(scheduledPodAutoscalerMaxReplicas))
+
+			// Target scheduled scaling with start at the current time and end in one hour
+			start := now.Format("15:04")
+			end := now.Add(time.Hour * 1).Format("15:04")
+			schedule := newSchedule(name,
+				WithScheduleMinReplicas(scheduleMinReplicas),
+				WithScheduleMaxReplicas(scheduleMaxReplicas),
+				WithScheduleType(autoscalingv1.Daily),
+				WithScheduleStartTime(start),
+				WithScheduleEndTime(end))
+
+			err := k8sClient.Create(ctx, spa)
+			gomega.Expect(err).Should(gomega.Succeed())
+
+			err = k8sClient.Create(ctx, schedule)
+			gomega.Expect(err).Should(gomega.Succeed())
+
+			var createdHPA hpav2beta2.HorizontalPodAutoscaler
+			var createdSchedule autoscalingv1.Schedule
+			gomega.Eventually(func() error {
+				if err := k8sClient.Get(ctx, client.ObjectKey{Name: name, Namespace: defaultTestNamespace}, &createdHPA); err != nil {
+					return err
+				}
+
+				if createdHPA.Spec.MinReplicas == nil {
+					return fmt.Errorf("created HPA minReplicas mismatch: want: %d, got: nil", scheduleMinReplicas)
+				}
+
+				if *createdHPA.Spec.MinReplicas != int32(scheduleMinReplicas) {
+					return fmt.Errorf("created HPA minReplicas mismatch: want: %d, got: %d",
+						scheduleMinReplicas, *createdHPA.Spec.MinReplicas)
+				}
+
+				if createdHPA.Spec.MaxReplicas != int32(scheduleMaxReplicas) {
+					return fmt.Errorf("created HPA maxReplicas mismatch: want: %d, got: %d",
+						scheduleMaxReplicas, createdHPA.Spec.MaxReplicas)
+				}
+
+				if err := k8sClient.Get(ctx, client.ObjectKey{Name: name, Namespace: defaultTestNamespace}, &createdSchedule); err != nil {
+					return err
+				}
+
+				if createdSchedule.Status.Condition != autoscalingv1.ScheduleProgressing {
+					return fmt.Errorf("schedule condition mismatch: want: %s, got: %s",
+						autoscalingv1.ScheduleProgressing, createdSchedule.Status.Condition)
+				}
+
+				return nil
+			}, /*timeout*/ defaultTestTimeout /*pollingInterval*/, defaultTestPollingInterval).Should(gomega.Succeed())
+		})
+		ginkgo.It("scheduled scaling suspend", func() {
+			const (
+				name                              = "scheduled-scaling-suspend-test"
 				namespace                         = "default"
 				scheduledPodAutoscalerMinReplicas = 1
 				scheduledPodAutoscalerMaxReplicas = 3
@@ -68,13 +131,15 @@ var _ = ginkgo.Describe("ScheduledPodAutoscaler controller", func() {
 
 			ctx := context.Background()
 			now := time.Now().UTC()
-			spa := newScheduledPodAutoscaler(name, namespace,
+			spa := newScheduledPodAutoscaler(name,
 				WithScheduledPodAutoscalerMinReplicas(scheduledPodAutoscalerMinReplicas),
 				WithScheduledPodAutoscalerMaxReplicas(scheduledPodAutoscalerMaxReplicas))
 
+			// Target scheduled scaling with start at the current time and end in one hour
 			start := now.Format("15:04")
 			end := now.Add(time.Hour * 1).Format("15:04")
-			schedule := newSchedule(name, namespace,
+			schedule := newSchedule(name,
+				WithScheduleSuspend(true), // suspend for scheduled scaling
 				WithScheduleMinReplicas(scheduleMinReplicas),
 				WithScheduleMaxReplicas(scheduleMaxReplicas),
 				WithScheduleType(autoscalingv1.Daily),
@@ -98,27 +163,27 @@ var _ = ginkgo.Describe("ScheduledPodAutoscaler controller", func() {
 					return fmt.Errorf("created HPA minReplicas mismatch: want: %d, got: nil", scheduleMinReplicas)
 				}
 
-				if *createdHPA.Spec.MinReplicas != int32(scheduleMinReplicas) {
+				if *createdHPA.Spec.MinReplicas != int32(scheduledPodAutoscalerMinReplicas) {
 					return fmt.Errorf("created HPA minReplicas mismatch: want: %d, got: %d",
-						scheduleMinReplicas, *createdHPA.Spec.MinReplicas)
+						scheduledPodAutoscalerMinReplicas, *createdHPA.Spec.MinReplicas)
 				}
 
-				if createdHPA.Spec.MaxReplicas != int32(scheduleMaxReplicas) {
+				if createdHPA.Spec.MaxReplicas != int32(scheduledPodAutoscalerMaxReplicas) {
 					return fmt.Errorf("created HPA maxReplicas mismatch: want: %d, got: %d",
-						scheduleMaxReplicas, createdHPA.Spec.MaxReplicas)
+						scheduledPodAutoscalerMaxReplicas, createdHPA.Spec.MaxReplicas)
 				}
 
 				if err := k8sClient.Get(ctx, client.ObjectKey{Name: name, Namespace: namespace}, &createdSchedule); err != nil {
 					return err
 				}
 
-				if createdSchedule.Status.Condition != autoscalingv1.ScheduleProgressing {
+				if createdSchedule.Status.Condition != autoscalingv1.ScheduleSuspend {
 					return fmt.Errorf("schedule condition mismatch: want: %s, got: %s",
-						autoscalingv1.ScheduleProgressing, createdSchedule.Status.Condition)
+						autoscalingv1.ScheduleSuspend, createdSchedule.Status.Condition)
 				}
 
 				return nil
-			}, /*timeout*/ time.Second*1 /*pollingInterval*/, time.Millisecond*100).Should(gomega.Succeed())
+			}, /*timeout*/ defaultTestTimeout /*pollingInterval*/, defaultTestPollingInterval).Should(gomega.Succeed())
 		})
 	})
 })
@@ -128,8 +193,7 @@ const (
 	defaultSPAMaxReplicas = 3
 )
 
-func newScheduledPodAutoscaler(name string, namespace string,
-	options ...func(*autoscalingv1.ScheduledPodAutoscaler)) *autoscalingv1.ScheduledPodAutoscaler {
+func newScheduledPodAutoscaler(name string, options ...func(*autoscalingv1.ScheduledPodAutoscaler)) *autoscalingv1.ScheduledPodAutoscaler {
 	spa := &autoscalingv1.ScheduledPodAutoscaler{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: autoscalingv1.GroupVersion.String(),
@@ -137,7 +201,7 @@ func newScheduledPodAutoscaler(name string, namespace string,
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      name,
-			Namespace: namespace,
+			Namespace: defaultTestNamespace,
 		},
 		Spec: autoscalingv1.ScheduledPodAutoscalerSpec{
 			HorizontalPodAutoscalerSpec: hpav2beta2.HorizontalPodAutoscalerSpec{

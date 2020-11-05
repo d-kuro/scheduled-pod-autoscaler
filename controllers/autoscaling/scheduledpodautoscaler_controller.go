@@ -151,6 +151,16 @@ func (r *ScheduledPodAutoscalerReconciler) reconcileHPA(ctx context.Context, log
 			return updated, err
 		}
 
+		log.Info("checking included in the schedule scaling period",
+			"type", schedule.Spec.ScheduleType,
+			"now", now,
+			"startTime", schedule.Spec.StartTime,
+			"endTime", schedule.Spec.EndTime,
+			"startDayOfWeek", schedule.Spec.StartDayOfWeek,
+			"endDayOfWeek", schedule.Spec.EndDayOfWeek,
+			"isContains", isContains,
+		)
+
 		if isContains {
 			processSchedule = append(processSchedule, schedule)
 

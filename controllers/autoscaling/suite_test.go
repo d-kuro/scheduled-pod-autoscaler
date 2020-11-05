@@ -19,6 +19,7 @@ package controllers
 import (
 	"path/filepath"
 	"testing"
+	"time"
 
 	autoscalingv1 "github.com/d-kuro/scheduled-pod-autoscaler/apis/autoscaling/v1"
 	. "github.com/onsi/ginkgo"
@@ -35,6 +36,12 @@ import (
 
 // These tests use Ginkgo (BDD-style Go testing framework). Refer to
 // http://onsi.github.io/ginkgo/ to learn more about Ginkgo.
+
+const (
+	defaultTestTimeout         = time.Second * 10
+	defaultTestPollingInterval = time.Second * 1
+	defaultTestNamespace       = "default"
+)
 
 var (
 	cfg       *rest.Config

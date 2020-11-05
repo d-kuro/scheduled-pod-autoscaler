@@ -94,3 +94,9 @@ CONTROLLER_GEN_V3=$(GOBIN)/controller-gen-v3
 else
 CONTROLLER_GEN_V3=$(shell which controller-gen-v3)
 endif
+
+generate-install-crd: controller-gen
+	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=manifests/crds
+
+generate-install-crd-legacy: controller-gen-v3
+	$(CONTROLLER_GEN_V3) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=manifests/crds/legacy

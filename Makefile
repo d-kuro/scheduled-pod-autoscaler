@@ -78,3 +78,19 @@ CONTROLLER_GEN=$(GOBIN)/controller-gen
 else
 CONTROLLER_GEN=$(shell which controller-gen)
 endif
+
+controller-gen-v3:
+ifeq (, $(shell which controller-gen-v3))
+	@{ \
+	set -e ;\
+	CONTROLLER_GEN_TMP_DIR=$$(mktemp -d) ;\
+	git -c advice.detachedHead=false clone --single-branch -b v0.3.0 \
+	  https://github.com/kubernetes-sigs/controller-tools.git $$CONTROLLER_GEN_TMP_DIR ;\
+	cd $$CONTROLLER_GEN_TMP_DIR ;\
+	go build -o $(GOBIN)/controller-gen-v3 ./cmd/controller-gen/... ;\
+	rm -rf $$CONTROLLER_GEN_TMP_DIR ;\
+	}
+CONTROLLER_GEN_V3=$(GOBIN)/controller-gen-v3
+else
+CONTROLLER_GEN_V3=$(shell which controller-gen-v3)
+endif

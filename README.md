@@ -72,7 +72,7 @@ test-2   nginx       Daily     20:20              20:25                         
 test-3   nginx       OneShot   2020-10-31T20:30   2020-10-31T20:35                                   4         4         Completed   4m49s
 ```
 
-`Schedule` supports 4 different schedule types.
+`Schedule` supports 3 different schedule types.
 
 #### type: Weekly
 

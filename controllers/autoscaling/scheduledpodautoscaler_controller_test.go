@@ -55,7 +55,7 @@ var _ = ginkgo.Describe("ScheduledPodAutoscaler controller", func() {
 				return nil
 			}, /*timeout*/ time.Second*1 /*pollingInterval*/, time.Millisecond*100).Should(gomega.Succeed())
 		})
-		ginkgo.It("scheduled scaling works fine", func() {
+		ginkgo.It("should scaling with daily scheduled scaling", func() {
 			const (
 				name                              = "scheduled-scaling-test"
 				scheduledPodAutoscalerMinReplicas = 1
@@ -119,7 +119,7 @@ var _ = ginkgo.Describe("ScheduledPodAutoscaler controller", func() {
 				return nil
 			}, /*timeout*/ defaultTestTimeout /*pollingInterval*/, defaultTestPollingInterval).Should(gomega.Succeed())
 		})
-		ginkgo.It("scheduled scaling suspend", func() {
+		ginkgo.It("should suspend scheduled scaling", func() {
 			const (
 				name                              = "scheduled-scaling-suspend-test"
 				namespace                         = "default"
@@ -180,6 +180,69 @@ var _ = ginkgo.Describe("ScheduledPodAutoscaler controller", func() {
 				if createdSchedule.Status.Condition != autoscalingv1.ScheduleSuspend {
 					return fmt.Errorf("schedule condition mismatch: want: %s, got: %s",
 						autoscalingv1.ScheduleSuspend, createdSchedule.Status.Condition)
+				}
+
+				return nil
+			}, /*timeout*/ defaultTestTimeout /*pollingInterval*/, defaultTestPollingInterval).Should(gomega.Succeed())
+		})
+		ginkgo.It("should completed scheduled scaling", func() {
+			const (
+				name                              = "scheduled-scaling-completed-test"
+				namespace                         = "default"
+				scheduledPodAutoscalerMinReplicas = 1
+				scheduledPodAutoscalerMaxReplicas = 3
+				scheduleMinReplicas               = 5
+				scheduleMaxReplicas               = 10
+			)
+
+			ctx := context.Background()
+			now := time.Now().UTC()
+			spa := newScheduledPodAutoscaler(name,
+				WithScheduledPodAutoscalerMinReplicas(scheduledPodAutoscalerMinReplicas),
+				WithScheduledPodAutoscalerMaxReplicas(scheduledPodAutoscalerMaxReplicas))
+
+			// A one-shot schedule with scaling completed
+			start := now.AddDate(0, 0, -1).Format("2006-01-02T15:04")
+			end := now.AddDate(0, 0, -10).Format("2006-01-02T15:04")
+			schedule := newSchedule(name,
+				WithScheduleType(autoscalingv1.OneShot),
+				WithScheduleStartTime(start),
+				WithScheduleEndTime(end))
+
+			err := k8sClient.Create(ctx, spa)
+			gomega.Expect(err).Should(gomega.Succeed())
+
+			err = k8sClient.Create(ctx, schedule)
+			gomega.Expect(err).Should(gomega.Succeed())
+
+			var createdHPA hpav2beta2.HorizontalPodAutoscaler
+			var createdSchedule autoscalingv1.Schedule
+			gomega.Eventually(func() error {
+				if err := k8sClient.Get(ctx, client.ObjectKey{Name: name, Namespace: namespace}, &createdHPA); err != nil {
+					return err
+				}
+
+				if createdHPA.Spec.MinReplicas == nil {
+					return fmt.Errorf("created HPA minReplicas mismatch: want: %d, got: nil", scheduleMinReplicas)
+				}
+
+				if *createdHPA.Spec.MinReplicas != int32(scheduledPodAutoscalerMinReplicas) {
+					return fmt.Errorf("created HPA minReplicas mismatch: want: %d, got: %d",
+						scheduledPodAutoscalerMinReplicas, *createdHPA.Spec.MinReplicas)
+				}
+
+				if createdHPA.Spec.MaxReplicas != int32(scheduledPodAutoscalerMaxReplicas) {
+					return fmt.Errorf("created HPA maxReplicas mismatch: want: %d, got: %d",
+						scheduledPodAutoscalerMaxReplicas, createdHPA.Spec.MaxReplicas)
+				}
+
+				if err := k8sClient.Get(ctx, client.ObjectKey{Name: name, Namespace: namespace}, &createdSchedule); err != nil {
+					return err
+				}
+
+				if createdSchedule.Status.Condition != autoscalingv1.ScheduleCompleted {
+					return fmt.Errorf("schedule condition mismatch: want: %s, got: %s",
+						autoscalingv1.ScheduleCompleted, createdSchedule.Status.Condition)
 				}
 
 				return nil

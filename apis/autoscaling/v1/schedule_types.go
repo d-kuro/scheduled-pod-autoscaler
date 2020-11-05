@@ -31,12 +31,12 @@ type ScheduleSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	// scaleTargetRef points to the target resource to scale, and is used to the pods for which metrics
+	// ScaleTargetRef points to the target resource to scale, and is used to the pods for which metrics
 	// should be collected, as well as to actually change the replica count.
 	// +kubebuiler:validation:Required
 	ScaleTargetRef autoscalingv2beta2.CrossVersionObjectReference `json:"scaleTargetRef"`
 
-	// Suspend indicates whether to suspend this schedule.
+	// Suspend indicates whether to suspend this schedule. (default is false)
 	// +optional
 	Suspend bool `json:"suspend"`
 
@@ -61,7 +61,7 @@ type ScheduleSpec struct {
 	// +optional
 	MaxReplicas *int32 `json:"maxReplicas,omitempty"`
 
-	// ScheduleType is a type of schedule represented by Weekly,Daily,OneShot.
+	// ScheduleType is a type of schedule represented by "Weekly","Daily","OneShot".
 	// +kubebuiler:validation:Required
 	// +kubebuilder:validation:Enum=Weekly;Daily;OneShot
 	ScheduleType ScheduleType `json:"type"`

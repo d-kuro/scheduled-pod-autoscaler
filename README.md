@@ -9,13 +9,13 @@ scheduled-pod-autoscaler is made up of two custom resources.
 The parent-child relationship can look like this:
 
 ```console
-$ kubectl tree scheduledpodautoscaler api
-NAMESPACE  NAME                                 READY  REASON  AGE
-default    ScheduledPodAutoscaler/api           -              7m20s
-default    ├─HorizontalPodAutoscaler/api        -              7m18s
-default    ├─Schedule/api-push-notification-01  -              7m20s
-default    ├─Schedule/api-push-notification-02  -              7m20s
-default    └─Schedule/api-push-notification-03  -              77s
+$ kubectl tree scheduledpodautoscaler nginx
+NAMESPACE  NAME                             READY  REASON  AGE
+default    ScheduledPodAutoscaler/nginx     -              6m5s
+default    ├─HorizontalPodAutoscaler/nginx  -              6m5s
+default    ├─Schedule/test-1                -              6m4s
+default    ├─Schedule/test-2                -              6m4s
+default    └─Schedule/test-3                -              6m4s
 ```
 
 ### ScheduledPodAutoscaler
@@ -51,8 +51,8 @@ spec:
 
 ```console
 $ kubectl get spa # You can use spa as a short name of scheduledpodautoscaler.
-NAME   MINPODS   MAXPODS   STATUS      AGE
-api    3         10        Available   2m43s
+NAME    MINPODS   MAXPODS   STATUS      AGE
+nginx   3         10        Available   6m52s
 ```
 
 ### Schedule
@@ -65,6 +65,14 @@ rewrites `HorizontalPodAutoscaler` created by `ScheduledPodAutoscaler` when it i
 `HorizontalPodAutoscaler` is not managed in Git, so there is no diffs in GitOps.
 
 `Schedule` supports 4 different schedule types.
+
+```console
+$ kubectl get schedule -o wide
+NAME     REFERENCE   TYPE      STARTTIME          ENDTIME            STARTDAYOFWEEK   ENDDAYOFWEEK   MINPODS   MAXPODS   STATUS      AGE
+test-1   nginx       Weekly    20:10              20:15              Saturday         Saturday       1         1         Available   4m49s
+test-2   nginx       Daily     20:20              20:25                                              2         2         Available   4m49s
+test-3   nginx       OneShot   2020-10-31T20:30   2020-10-31T20:35                                   4         4         Completed   4m49s
+```
 
 #### type: Weekly
 
@@ -137,3 +145,30 @@ spec:
 ## Install
 
 > TBD
+
+## Spec
+
+### ScheduledPodAutoscaler
+
+| name | type | required | description |
+| - | - | - | - |
+| `.spec.horizontalPodAutoscalerSpec` | `Object` | required | HorizontalPodAutoscalerSpec is HorizontalPodAutoscaler v2beta2 API spec. |
+
+### Schedule
+
+| name | type | required | description |
+| - | - | - | - |
+| `.spec.scaleTargetRef` | `Object` | required | ScaleTargetRef points to the target resource to scale, and is used to the pods for which metrics should be collected, as well as to actually change the replica count. |
+| `.spec.scaleTargetRef.apiVersion` | `string` | optional | API version of the referent. |
+| `.spec.scaleTargetRef.kind` | `string` | required | Kind of the referent. |
+| `.spec.scaleTargetRef.name` | `string` | required | Name of the referent. |
+| `.spec.description` | `string` | optional | Description is schedule description. |
+| `.spec.suspend` | `boolean` | optional | Suspend indicates whether to suspend this schedule. |
+| `.spec.timeZone` | `string` | optional | TimeZone is the name of the timezone used in the argument of the time.LoadLocation(name string) function. StartTime and EndTime are interpreted as the time in the time zone specified by TimeZone. If not specified, the time will be interpreted as UTC. |
+| `.spec.minReplicas` | `integer` | optional | MinReplicas is the lower limit for the number of replicas to which the autoscaler can scale down. It defaults to 1 pod. |
+| `.spec.maxReplicas` | `integer` | optional | MaxReplicas is the upper limit for the number of replicas to which the autoscaler can scale up. |
+| `.spec.type` | `string` | required | ScheduleType is a type of schedule represented by "Weekly","Daily","OneShot". |
+| `.spec.startDayOfWeek` | `string` | optional | StartDayOfWeek is scaling start day of week. |
+| `.spec.endDayOfWeek` | `string` | optional | EndDayOfWeek is scaling end day of week. |
+| `.spec.startTime` | `string` | required | StartTime is scaling start time. Defined in RFC3339 based format. Different formats are evaluated depending on ScheduleType. e.g. OneShot(yyyy-MM-ddTHH:mm), Weekly(HH:mm), Daily(HH:mm) |
+| `.spec.endTime` | `string` | required | EndTime is scaling end time. Defined in RFC3339 based format. Different formats are evaluated depending on ScheduleType. e.g. OneShot(yyyy-MM-ddTHH:mm), Weekly(HH:mm), Daily(HH:mm) |

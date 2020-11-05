@@ -97,6 +97,9 @@ else
 CONTROLLER_GEN_V3=$(shell which controller-gen-v3)
 endif
 
+# generate install manifests
+generate-install: generate-install-crd generate-install-crd-legacy
+
 # generate crd for install
 generate-install-crd: controller-gen
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." \

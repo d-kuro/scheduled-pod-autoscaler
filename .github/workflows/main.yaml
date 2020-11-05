@@ -29,7 +29,7 @@ jobs:
           # (you'll need to set the KUBEBUILDER_ASSETS env var if you put it somewhere else)
           sudo mv /tmp/kubebuilder_2.3.1_${os}_${arch} /usr/local/kubebuilder
       - name: Run golangci-lint with reviewdog
-        uses: reviewdog/action-golangci-lint@v1.14.0
+        uses: reviewdog/action-golangci-lint@v1.14.1
         with:
           golangci_lint_flags: "--timeout=3m0s --fix"
           level: warning

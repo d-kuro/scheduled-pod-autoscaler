@@ -95,7 +95,7 @@ func (r *ScheduleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, nil
 	}
 
-	if schedule.Status.Condition == autoscalingv1.ScheduleSuspend {
+	if schedule.Status.Condition != autoscalingv1.ScheduleSuspend {
 		if err := r.updateScheduleStatus(ctx, log, schedule, autoscalingv1.ScheduleAvailable); err != nil {
 			return ctrl.Result{}, err
 		}

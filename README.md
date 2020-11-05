@@ -64,6 +64,10 @@ The `ScheduledPodAutoscaler` controller refers to the `Schedule` and
 rewrites `HorizontalPodAutoscaler` created by `ScheduledPodAutoscaler` when it is time for scheduled scaling.
 `HorizontalPodAutoscaler` is not managed in Git, so there is no diffs in GitOps.
 
+> 📝 Note: A case of schedule conflicts
+>
+> In case of a schedule conflict, using the maximum value of min/max replicas.
+
 ```console
 $ kubectl get schedule -o wide
 NAME     REFERENCE   TYPE      STARTTIME          ENDTIME            STARTDAYOFWEEK   ENDDAYOFWEEK   MINPODS   MAXPODS   STATUS      AGE

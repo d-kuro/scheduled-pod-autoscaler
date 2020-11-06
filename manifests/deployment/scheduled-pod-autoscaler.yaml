@@ -21,9 +21,14 @@ spec:
           name: manager
           ports:
             - containerPort: 8080
+            - containerPort: 9090
           resources:
             limits:
               memory: 100Mi
             requests:
               cpu: 100m
               memory: 100Mi
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 9090

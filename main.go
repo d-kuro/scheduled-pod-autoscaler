@@ -27,6 +27,7 @@ import (
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 )
 
@@ -44,8 +45,11 @@ func init() {
 
 func main() {
 	var metricsAddr string
+	var probeAddr string
 	var enableLeaderElection bool
+
 	flag.StringVar(&metricsAddr, "metrics-addr", ":8080", "The address the metric endpoint binds to.")
+	flag.StringVar(&probeAddr, "probe-addr", ":9090", "The address the liveness probe and readiness probe endpoints bind to.")
 	flag.BoolVar(&enableLeaderElection, "enable-leader-election", false,
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
@@ -56,15 +60,22 @@ func main() {
 	syncPeriod := 1 * time.Hour
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-		Scheme:             scheme,
-		MetricsBindAddress: metricsAddr,
-		Port:               9443,
-		SyncPeriod:         &syncPeriod,
-		LeaderElection:     enableLeaderElection,
-		LeaderElectionID:   "09d94c38.d-kuro.github.io",
+		Scheme:                 scheme,
+		MetricsBindAddress:     metricsAddr,
+		HealthProbeBindAddress: probeAddr,
+		LivenessEndpointName:   "/healthz",
+		Port:                   9443,
+		SyncPeriod:             &syncPeriod,
+		LeaderElection:         enableLeaderElection,
+		LeaderElectionID:       "09d94c38.d-kuro.github.io",
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
+		os.Exit(1)
+	}
+
+	if err = mgr.AddHealthzCheck("ping", healthz.Ping); err != nil {
+		setupLog.Error(err, "unable to add healthz check")
 		os.Exit(1)
 	}
 

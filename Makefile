@@ -97,17 +97,22 @@ else
 CONTROLLER_GEN_V3=$(shell which controller-gen-v3)
 endif
 
-# generate install manifests
-generate-install: generate-install-crd generate-install-crd-legacy
-	kustomize build ./manifests/install/ > ./manifests/install/install.yaml
-	kustomize build ./manifests/install/legacy/ > ./manifests/install/legacy/install.yaml
+# generate all
+generate-all: generate manifests generate-install generate-install-legacy
 
-# generate crd for install
-generate-install-crd: controller-gen
+# generate install manifests
+generate-install: controller-gen
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=scheduled-pod-autoscaler-role paths="./..." \
 	  output:crd:artifacts:config=manifests/crd \
 	  output:rbac:artifacts:config=manifests/rbac
+	kustomize build ./manifests/install/ > ./manifests/install/install.yaml
 
-# generate crd for install (Kubernetes < v1.16)
-generate-install-crd-legacy: controller-gen-v3
+# generate install manifests (Kubernetes < v1.16)
+generate-install-legacy: controller-gen-v3
 	$(CONTROLLER_GEN_V3) $(CRD_OPTIONS) paths="./..." output:crd:artifacts:config=manifests/crd/legacy
+	kustomize build ./manifests/install/legacy/ > ./manifests/install/legacy/install.yaml
+
+# check generated files up to date
+# If this fails, try "make generate-all"
+check-generated-files-up-to-date: generate manifests generate-install generate-install-legacy
+	git diff --exit-code

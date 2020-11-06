@@ -97,6 +97,9 @@ else
 CONTROLLER_GEN_V3=$(shell which controller-gen-v3)
 endif
 
+# install tools
+install-tools: controller-gen controller-gen-v3
+
 # generate all
 generate-all: generate manifests generate-install generate-install-legacy
 
@@ -114,5 +117,5 @@ generate-install-legacy: controller-gen-v3
 
 # check generated files up to date
 # If this fails, try "make generate-all"
-check-generated-files-up-to-date: generate manifests generate-install generate-install-legacy
+check-generated-files-up-to-date: generate-all
 	git diff --exit-code

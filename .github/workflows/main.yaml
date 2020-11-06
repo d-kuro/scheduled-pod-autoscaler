@@ -15,7 +15,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
       - name: Install tools
-        run: cat tools/tools.go | awk -F'"' '/_/ {print $2}' | xargs -tI {} go install {}
+        run: make install-tools
       - name: Install kubebuilder
         run: |
           # ref: https://book.kubebuilder.io/quick-start.html#installation

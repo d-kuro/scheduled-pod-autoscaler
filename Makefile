@@ -99,6 +99,8 @@ endif
 
 # generate install manifests
 generate-install: generate-install-crd generate-install-crd-legacy
+	kustomize build ./manifests/install/ > ./manifests/install/install.yaml
+	kustomize build ./manifests/install/legacy/ > ./manifests/install/legacy/install.yaml
 
 # generate crd for install
 generate-install-crd: controller-gen

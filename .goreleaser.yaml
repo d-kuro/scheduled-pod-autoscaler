@@ -1,0 +1,26 @@
+builds:
+  - main: ./main.go
+    binary: manager
+    goos:
+      - windows
+      - darwin
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    env:
+      - CGO_ENABLED=0
+      - GO111MODULE=on
+checksum:
+  name_template: checksums.txt
+archives:
+  - format: tar.gz
+changelog:
+  filters:
+    exclude:
+      - "Merge pull request"
+      - "Merge branch"
+release:
+  github:
+    owner: d-kuro
+    name: scheduled-pod-autoscaler

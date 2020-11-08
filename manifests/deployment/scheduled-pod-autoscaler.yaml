@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scheduled-pod-autoscaler
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: scheduled-pod-autoscaler
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: scheduled-pod-autoscaler
+    spec:
+      containers:
+        - command:
+            - /manager
+          args:
+            - --enable-leader-election
+          image: controller:latest
+          name: manager
+          ports:
+            - containerPort: 8080
+            - containerPort: 9090
+          resources:
+            limits:
+              memory: 100Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 9090

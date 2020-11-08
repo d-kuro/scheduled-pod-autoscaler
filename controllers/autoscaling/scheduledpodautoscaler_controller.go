@@ -125,13 +125,13 @@ func (r *ScheduledPodAutoscalerReconciler) reconcileHPA(ctx context.Context, log
 
 	var schedules autoscalingv1.ScheduleList
 	if err := r.List(ctx, &schedules, client.MatchingFields(map[string]string{ownerControllerField: spa.Name})); err != nil {
-		log.Error(err, "unable to list child Schedules")
+		log.Error(err, "unable to list child Schedules", "scheduledPodAutoscaler", spa)
 
 		return updated, err
 	}
 
 	if len(schedules.Items) == 0 {
-		log.Error(err, "not found child Schedules")
+		log.Info("not found child Schedules", "scheduledPodAutoscaler", spa)
 
 		return updated, nil
 	}
@@ -238,7 +238,7 @@ func (r *ScheduledPodAutoscalerReconciler) createHPA(ctx context.Context, log lo
 	}
 
 	if err := r.Create(ctx, &hpa, &client.CreateOptions{}); err != nil {
-		log.Info("unable to HPA", "hpa", hpa)
+		log.Info("unable to create HPA", "hpa", hpa)
 
 		if err := r.updateScheduledPodAutoscalerStatus(ctx, log, spa, autoscalingv1.ScheduledPodAutoscalerDegraded); err != nil {
 			log.Error(err, "unable to update ScheduledPodAutoscaler status", "scheduledPodAutoscaler", spa)

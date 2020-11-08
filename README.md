@@ -176,3 +176,17 @@ spec:
 | `.spec.endDayOfWeek` | `string` | optional | EndDayOfWeek is scaling end day of week. Represented by "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday". |
 | `.spec.startTime` | `string` | required | StartTime is scaling start time. Defined in RFC3339 based format. Different formats are evaluated depending on ScheduleType. e.g. OneShot(yyyy-MM-ddTHH:mm), Weekly(HH:mm), Daily(HH:mm) |
 | `.spec.endTime` | `string` | required | EndTime is scaling end time. Defined in RFC3339 based format. Different formats are evaluated depending on ScheduleType. e.g. OneShot(yyyy-MM-ddTHH:mm), Weekly(HH:mm), Daily(HH:mm) |
+
+## Metrics
+
+scheduled-pod-autoscaler exports metrics in [OpenMetrics](https://openmetrics.io/) format.
+
+You can get the metrics by access to `http://localhost:8080/metrics`.
+The port of the metrics endpoint can be changed using the `metrics-addr` option.
+
+### Custom Metrics
+
+| name | type | description |
+| - | - | - |
+| `scheduled_pod_auroscaler_min_replicas` | gauge | Lower limit for the number of pods that can be set by the scheduled pod autoscaler |
+| `scheduled_pod_auroscaler_max_replicas` | gauge | Upper limit for the number of pods that can be set by the scheduled pod autoscaler |

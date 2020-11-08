@@ -69,7 +69,17 @@ func (r *ScheduledPodAutoscalerReconciler) Reconcile(req ctrl.Request) (ctrl.Res
 			return ctrl.Result{}, err
 		}
 
+		if err := r.updateScheduledPodAutoscalerStatus(ctx, log, spa, autoscalingv1.ScheduledPodAutoscalerAvailable); err != nil {
+			log.Error(err, "unable to update ScheduledPodAutoscaler status", "scheduledPodAutoscaler", spa)
+		}
+
 		log.Info("successfully create HPA", "hpa", hpa)
+
+		if hpa.Spec.MinReplicas != nil {
+			minReplicasCounter.WithLabelValues(spa.Name, spa.Namespace).Set(float64(*hpa.Spec.MinReplicas))
+		}
+
+		maxReplicasCounter.WithLabelValues(spa.Name, spa.Namespace).Set(float64(hpa.Spec.MaxReplicas))
 	} else if err != nil {
 		log.Error(err, "unable to fetch HPA", "namespacedName", req.NamespacedName)
 
@@ -83,7 +93,7 @@ func (r *ScheduledPodAutoscalerReconciler) Reconcile(req ctrl.Request) (ctrl.Res
 		return ctrl.Result{}, err
 	}
 
-	if !updated {
+	if !updated && !equality.Semantic.DeepEqual(hpa.Spec, spa.Spec.HorizontalPodAutoscalerSpec) {
 		hpa.Spec = spa.Spec.HorizontalPodAutoscalerSpec
 		if err := r.Update(ctx, &hpa, &client.UpdateOptions{}); err != nil {
 			log.Error(err, "unable to update HPA", "hpa", hpa)
@@ -96,6 +106,12 @@ func (r *ScheduledPodAutoscalerReconciler) Reconcile(req ctrl.Request) (ctrl.Res
 		}
 
 		log.Info("successfully update HPA", "hpa", hpa)
+
+		if hpa.Spec.MinReplicas != nil {
+			minReplicasCounter.WithLabelValues(spa.Name, spa.Namespace).Set(float64(*hpa.Spec.MinReplicas))
+		}
+
+		maxReplicasCounter.WithLabelValues(spa.Name, spa.Namespace).Set(float64(hpa.Spec.MaxReplicas))
 	}
 
 	return ctrl.Result{Requeue: true, RequeueAfter: 30 * time.Second}, nil
@@ -109,13 +125,13 @@ func (r *ScheduledPodAutoscalerReconciler) reconcileHPA(ctx context.Context, log
 
 	var schedules autoscalingv1.ScheduleList
 	if err := r.List(ctx, &schedules, client.MatchingFields(map[string]string{ownerControllerField: spa.Name})); err != nil {
-		log.Error(err, "unable to list child Schedules")
+		log.Error(err, "unable to list child Schedules", "scheduledPodAutoscaler", spa)
 
 		return updated, err
 	}
 
 	if len(schedules.Items) == 0 {
-		log.Error(err, "not found child Schedules")
+		log.Info("not found child Schedules", "scheduledPodAutoscaler", spa)
 
 		return updated, nil
 	}
@@ -222,7 +238,7 @@ func (r *ScheduledPodAutoscalerReconciler) createHPA(ctx context.Context, log lo
 	}
 
 	if err := r.Create(ctx, &hpa, &client.CreateOptions{}); err != nil {
-		log.Info("unable to HPA", "hpa", hpa)
+		log.Info("unable to create HPA", "hpa", hpa)
 
 		if err := r.updateScheduledPodAutoscalerStatus(ctx, log, spa, autoscalingv1.ScheduledPodAutoscalerDegraded); err != nil {
 			log.Error(err, "unable to update ScheduledPodAutoscaler status", "scheduledPodAutoscaler", spa)
@@ -246,6 +262,12 @@ func (r *ScheduledPodAutoscalerReconciler) updateHPA(ctx context.Context, log lo
 
 	updated = true
 	log.Info("successfully update HPA", "hpa", hpa)
+
+	if hpa.Spec.MinReplicas != nil {
+		minReplicasCounter.WithLabelValues(hpa.Name, hpa.Namespace).Set(float64(*hpa.Spec.MinReplicas))
+	}
+
+	maxReplicasCounter.WithLabelValues(hpa.Name, hpa.Namespace).Set(float64(hpa.Spec.MaxReplicas))
 
 	return updated, nil
 }

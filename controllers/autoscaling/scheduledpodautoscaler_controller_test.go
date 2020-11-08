@@ -53,7 +53,7 @@ var _ = ginkgo.Describe("ScheduledPodAutoscaler controller", func() {
 				}
 
 				return nil
-			}, /*timeout*/ time.Second*1 /*pollingInterval*/, time.Millisecond*100).Should(gomega.Succeed())
+			}, /*timeout*/ defaultTestTimeout /*pollingInterval*/, defaultTestPollingInterval).Should(gomega.Succeed())
 		})
 		ginkgo.It("should scaling with daily scheduled scaling", func() {
 			const (

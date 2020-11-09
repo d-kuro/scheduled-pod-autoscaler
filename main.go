@@ -47,6 +47,10 @@ func main() {
 	var metricsAddr string
 	var probeAddr string
 	var enableLeaderElection bool
+	syncPeriod := 1 * time.Hour
+
+	opts := zap.Options{}
+	opts.BindFlags(flag.CommandLine)
 
 	flag.StringVar(&metricsAddr, "metrics-addr", ":8080", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "probe-addr", ":9090", "The address the liveness probe and readiness probe endpoints bind to.")
@@ -55,9 +59,7 @@ func main() {
 			"Enabling this will ensure there is only one active controller manager.")
 	flag.Parse()
 
-	ctrl.SetLogger(zap.New(zap.UseDevMode(true)))
-
-	syncPeriod := 1 * time.Hour
+	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:                 scheme,

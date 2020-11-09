@@ -1,5 +1,12 @@
 name: main
-on: [pull_request]
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+    paths-ignore: ['**.md']
+  pull_request:
+    types: [opened, synchronize]
+    paths-ignore: ['**.md']
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -28,6 +35,8 @@ jobs:
           # move to a long-term location and put it on your path
           # (you'll need to set the KUBEBUILDER_ASSETS env var if you put it somewhere else)
           sudo mv /tmp/kubebuilder_2.3.1_${os}_${arch} /usr/local/kubebuilder
+      - name: Ensure go.mod is already tidied # ref: https://text.superbrothers.dev/200510-ensure-go-mod-is-already-tidied-on-ci/
+        run: go mod tidy && git diff -s --exit-code go.sum
       - name: Run golangci-lint with reviewdog
         uses: reviewdog/action-golangci-lint@v1.14.1
         with:

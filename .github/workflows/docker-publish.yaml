@@ -17,9 +17,8 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.CR_PAT }}
-      - name: extract tag
-        id: extract-tag
-        run: echo "${GITHUB_REF#refs/tags/}" >> $IMAGE_TAG
+      - name: Extract git tag
+        run: echo "IMAGE_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
       - uses: docker/build-push-action@v2
         with:
           platforms: linux/amd64, linux/arm64

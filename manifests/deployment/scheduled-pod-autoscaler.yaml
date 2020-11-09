@@ -32,3 +32,4 @@ spec:
             httpGet:
               path: /healthz
               port: 9090
+      serviceAccountName: scheduled-pod-autoscaler

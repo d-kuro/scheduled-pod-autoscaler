@@ -785,3 +785,4 @@ spec:
           requests:
             cpu: 100m
             memory: 100Mi
+      serviceAccountName: scheduled-pod-autoscaler

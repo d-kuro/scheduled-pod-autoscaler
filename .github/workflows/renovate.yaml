@@ -14,8 +14,8 @@ jobs:
       - name: Update go.sum
         uses: at-wat/go-sum-fix-action@v0
         with:
-          git_user: @@MAINTAINER_NAME@@
-          git_email: @@MAINTAINER_EMAIL_ADDRESS@@
+          git_user: d-kuro
+          git_email: kurosawa7620@gmail.com
           github_token: ${{ secrets.GITHUB_TOKEN }}
           commit_style: squash
           push: force

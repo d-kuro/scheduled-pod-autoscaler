@@ -11,6 +11,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 2
+      # ref: https://kamatama41.hatenablog.com/entry/2020/06/04/202845
       - name: Update go.sum
         uses: at-wat/go-sum-fix-action@v0
         with:

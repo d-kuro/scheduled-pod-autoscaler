@@ -2,11 +2,14 @@
 
 [![PkgGoDev](https://pkg.go.dev/badge/d-kuro/scheduled-pod-autoscaler)](https://pkg.go.dev/d-kuro/scheduled-pod-autoscaler) ![](https://github.com/d-kuro/scheduled-pod-autoscaler/workflows/main/badge.svg)
 
-GitOps native scheduled scaling controller.
+Custom Kubernetes controller for GitOps native scheduled scaling.
+
+Autoscaling with `HorizontalPodAutoscaler` is difficult to use for spike access etc.
+`ScheduledPodAutoscaler` can for more flexible autoscaling by controlling min/max replicas at specific times.
 
 ## Overview
 
-scheduled-pod-autoscaler is made up of two custom resources.
+`ScheduledPodAutoscaler` is made up of two custom resources.
 
 The parent-child relationship can look like this:
 
@@ -22,7 +25,7 @@ default    └─Schedule/test-3                -              6m4s
 
 ### ScheduledPodAutoscaler
 
-`ScheduledPodAutoscaler` is a custom resource that wraps `HorizontalPodAutoscaler`.  
+`ScheduledPodAutoscaler` is a custom resource that wraps `HorizontalPodAutoscaler`.
 The `ScheduledPodAutoscaler` Controller generates a `HorizontalPodAutoscaler` from this resource.
 
 The specs of the `HorizontalPodAutoscaler` defined here will be used when no scheduled scaling is taking place.
@@ -59,16 +62,22 @@ nginx   3         10        Available   6m52s
 
 ### Schedule
 
-`Schedule` is a custom resource for defining scheduled scaling.  
+`Schedule` is a custom resource for defining scheduled scaling.
 You can define multiple children's `Schedule` for the parent `ScheduledPodAutoscaler`.
 
 The `ScheduledPodAutoscaler` controller refers to the `Schedule` and
 rewrites `HorizontalPodAutoscaler` created by `ScheduledPodAutoscaler` when it is time for scheduled scaling.
-`HorizontalPodAutoscaler` is not managed in Git, so there is no diffs in GitOps.
+`HorizontalPodAutoscaler` is not managed in Git, so there are no diffs in GitOps.
 
 > 📝 Note: A case of schedule conflicts
 >
 > In case of a schedule conflict, using the maximum value of min/max replicas.
+
+> 📝 Note: Warm-up time
+>
+> The `ScheduledPodAutoscaler` controller only changes the min/max replica of `HorizontalPodAutoscaler`.
+> Launching the Pod will take some time.
+> Be sure to set a generous amount of time for scheduled scaling.
 
 ```console
 $ kubectl get schedule -o wide

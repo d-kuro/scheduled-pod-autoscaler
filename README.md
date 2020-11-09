@@ -1,5 +1,7 @@
 # scheduled-pod-autoscaler
 
+[![PkgGoDev](https://pkg.go.dev/badge/d-kuro/scheduled-pod-autoscaler)](https://pkg.go.dev/d-kuro/scheduled-pod-autoscaler) ![](https://github.com/d-kuro/scheduled-pod-autoscaler/workflows/main/badge.svg)
+
 **Work in Progress** GitOps Native Schedule Scaling of Kubernetes Resources.
 
 ## Overview
@@ -31,13 +33,13 @@ for example:
 apiVersion: autoscaling.d-kuro.github.io/v1
 kind: ScheduledPodAutoscaler
 metadata:
-  name: api
+  name: nginx
 spec:
   horizontalPodAutoscalerSpec:
     scaleTargetRef:
       apiVersion: apps/v1
       kind: Deployment
-      name: api
+      name: nginx
     minReplicas: 3
     maxReplicas: 10
     metrics:
@@ -86,12 +88,12 @@ Write the time in the format of `HH:mm` and specify the day of the week.
 apiVersion: autoscaling.d-kuro.github.io/v1
 kind: Schedule
 metadata:
-  name: api-push-notification
+  name: nginx-push-notification
 spec:
   scaleTargetRef:
     apiVersion: autoscaling.d-kuro.github.io/v1
     kind: ScheduledPodAutoscaler
-    name: api
+    name: nginx
   minReplicas: 10
   maxReplicas: 20
   type: Weekly
@@ -110,12 +112,12 @@ Write the time in the format of `HH:mm`.
 apiVersion: autoscaling.d-kuro.github.io/v1
 kind: Schedule
 metadata:
-  name: api-push-notification
+  name: nginx-push-notification
 spec:
   scaleTargetRef:
     apiVersion: autoscaling.d-kuro.github.io/v1
     kind: ScheduledPodAutoscaler
-    name: api
+    name: nginx
   minReplicas: 10
   maxReplicas: 20
   type: Daily
@@ -132,12 +134,12 @@ Write the time in the format of `yyyy-MM-ddTHH:mm`.
 apiVersion: autoscaling.d-kuro.github.io/v1
 kind: Schedule
 metadata:
-  name: api-push-notification
+  name: nginx-push-notification
 spec:
   scaleTargetRef:
     apiVersion: autoscaling.d-kuro.github.io/v1
     kind: ScheduledPodAutoscaler
-    name: api
+    name: nginx
   minReplicas: 10
   maxReplicas: 20
   type: OneShot
@@ -190,3 +192,27 @@ The port of the metrics endpoint can be changed using the `metrics-addr` option.
 | - | - | - |
 | `scheduled_pod_auroscaler_min_replicas` | gauge | Lower limit for the number of pods that can be set by the scheduled pod autoscaler |
 | `scheduled_pod_auroscaler_max_replicas` | gauge | Upper limit for the number of pods that can be set by the scheduled pod autoscaler |
+
+## Args
+
+```text
+Usage scheduled-pod-autoscaler:
+  -enable-leader-election
+    	Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager.
+  -kubeconfig string
+    	Paths to a kubeconfig. Only required if out-of-cluster.
+  -master --kubeconfig
+    	(Deprecated: switch to --kubeconfig) The address of the Kubernetes API server. Overrides any value in kubeconfig. Only required if out-of-cluster.
+  -metrics-addr string
+    	The address the metric endpoint binds to. (default ":8080")
+  -probe-addr string
+    	The address the liveness probe and readiness probe endpoints bind to. (default ":9090")
+  -zap-devel
+    	Development Mode defaults(encoder=consoleEncoder,logLevel=Debug,stackTraceLevel=Warn). Production Mode defaults(encoder=jsonEncoder,logLevel=Info,stackTraceLevel=Error)
+  -zap-encoder value
+    	Zap log encoding ('json' or 'console')
+  -zap-log-level value
+    	Zap Level to configure the verbosity of logging. Can be one of 'debug', 'info', 'error', or any integer value > 0 which corresponds to custom debug levels of increasing verbosity
+  -zap-stacktrace-level value
+    	Zap Level at and above which stacktraces are captured (one of 'info', 'error').
+```

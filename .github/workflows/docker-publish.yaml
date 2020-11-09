@@ -19,9 +19,9 @@ jobs:
           password: ${{ secrets.CR_PAT }}
       - name: extract tag
         id: extract-tag
-        run: echo "::set-env name=TAG::${GITHUB_REF#refs/tags/}"
+        run: echo "${GITHUB_REF#refs/tags/}" >> $IMAGE_TAG
       - uses: docker/build-push-action@v2
         with:
           platforms: linux/amd64, linux/arm64
           push: true
-          tags: ghcr.io/d-kuro/scheduled-pod-autoscaler:${{ steps.extract-tag.outputs.TAG }}
+          tags: ghcr.io/d-kuro/scheduled-pod-autoscaler:${IMAGE_TAG}

@@ -31,13 +31,13 @@ for example:
 apiVersion: autoscaling.d-kuro.github.io/v1
 kind: ScheduledPodAutoscaler
 metadata:
-  name: api
+  name: nginx
 spec:
   horizontalPodAutoscalerSpec:
     scaleTargetRef:
       apiVersion: apps/v1
       kind: Deployment
-      name: api
+      name: nginx
     minReplicas: 3
     maxReplicas: 10
     metrics:
@@ -86,12 +86,12 @@ Write the time in the format of `HH:mm` and specify the day of the week.
 apiVersion: autoscaling.d-kuro.github.io/v1
 kind: Schedule
 metadata:
-  name: api-push-notification
+  name: nginx-push-notification
 spec:
   scaleTargetRef:
     apiVersion: autoscaling.d-kuro.github.io/v1
     kind: ScheduledPodAutoscaler
-    name: api
+    name: nginx
   minReplicas: 10
   maxReplicas: 20
   type: Weekly
@@ -110,12 +110,12 @@ Write the time in the format of `HH:mm`.
 apiVersion: autoscaling.d-kuro.github.io/v1
 kind: Schedule
 metadata:
-  name: api-push-notification
+  name: nginx-push-notification
 spec:
   scaleTargetRef:
     apiVersion: autoscaling.d-kuro.github.io/v1
     kind: ScheduledPodAutoscaler
-    name: api
+    name: nginx
   minReplicas: 10
   maxReplicas: 20
   type: Daily
@@ -132,12 +132,12 @@ Write the time in the format of `yyyy-MM-ddTHH:mm`.
 apiVersion: autoscaling.d-kuro.github.io/v1
 kind: Schedule
 metadata:
-  name: api-push-notification
+  name: nginx-push-notification
 spec:
   scaleTargetRef:
     apiVersion: autoscaling.d-kuro.github.io/v1
     kind: ScheduledPodAutoscaler
-    name: api
+    name: nginx
   minReplicas: 10
   maxReplicas: 20
   type: OneShot

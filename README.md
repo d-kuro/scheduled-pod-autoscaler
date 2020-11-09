@@ -2,7 +2,7 @@
 
 [![PkgGoDev](https://pkg.go.dev/badge/d-kuro/scheduled-pod-autoscaler)](https://pkg.go.dev/d-kuro/scheduled-pod-autoscaler) ![](https://github.com/d-kuro/scheduled-pod-autoscaler/workflows/main/badge.svg)
 
-**Work in Progress** GitOps Native Schedule Scaling of Kubernetes Resources.
+GitOps native scheduled scaling controller.
 
 ## Overview
 
@@ -157,10 +157,10 @@ By default, it is installed in the `kube-system` namespace.
 
 ```console
 # Kubernetes 1.16+
-$ kubectl apply -f https://raw.githubusercontent.com/d-kuro/scheduled-pod-autoscaler/v0.0.1-rc.1/manifests/install/install.yaml
+$ kubectl apply -f https://raw.githubusercontent.com/d-kuro/scheduled-pod-autoscaler/v0.0.1/manifests/install/install.yaml
 
 # Kubernetes < 1.16
-$ kubectl apply -f https://raw.githubusercontent.com/d-kuro/scheduled-pod-autoscaler/v0.0.1-rc.1/manifests/install/legacy/install.yaml
+$ kubectl apply -f https://raw.githubusercontent.com/d-kuro/scheduled-pod-autoscaler/v0.0.1/manifests/install/legacy/install.yaml
 ```
 
 ### Kustomize
@@ -172,7 +172,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - github.com/d-kuro/scheduled-pod-autoscaler/manifests/install?ref=v0.0.1-rc.1
+  - github.com/d-kuro/scheduled-pod-autoscaler/manifests/install?ref=v0.0.1
 ```
 
 ## Spec

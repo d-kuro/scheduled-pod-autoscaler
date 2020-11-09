@@ -150,7 +150,30 @@ spec:
 
 ## Install
 
-> TBD
+All resources (the CRDs, Deployment and RBAC)
+are included in a single YAML manifest file.
+
+By default, it is installed in the `kube-system` namespace.
+
+```console
+# Kubernetes 1.16+
+$ kubectl apply -f https://raw.githubusercontent.com/d-kuro/scheduled-pod-autoscaler/v0.0.1-rc.1/manifests/install/install.yaml
+
+# Kubernetes < 1.16
+$ kubectl apply -f https://raw.githubusercontent.com/d-kuro/scheduled-pod-autoscaler/v0.0.1-rc.1/manifests/install/legacy/install.yaml
+```
+
+### Kustomize
+
+Support for kustomize remote base:
+
+```yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - github.com/d-kuro/scheduled-pod-autoscaler/manifests/install?ref=v0.0.1-rc.1
+```
 
 ## Spec
 
@@ -193,7 +216,7 @@ The port of the metrics endpoint can be changed using the `metrics-addr` option.
 | `scheduled_pod_auroscaler_min_replicas` | gauge | Lower limit for the number of pods that can be set by the scheduled pod autoscaler |
 | `scheduled_pod_auroscaler_max_replicas` | gauge | Upper limit for the number of pods that can be set by the scheduled pod autoscaler |
 
-## Args
+## Options
 
 ```text
 Usage scheduled-pod-autoscaler:

@@ -770,7 +770,7 @@ spec:
         - --enable-leader-election
         command:
         - /manager
-        image: controller:latest
+        image: ghcr.io/d-kuro/scheduled-pod-autoscaler:v0.0.1-rc.1
         livenessProbe:
           httpGet:
             path: /healthz
@@ -785,3 +785,4 @@ spec:
           requests:
             cpu: 100m
             memory: 100Mi
+      serviceAccountName: scheduled-pod-autoscaler

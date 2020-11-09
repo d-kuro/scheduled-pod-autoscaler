@@ -17,7 +17,7 @@ spec:
             - /manager
           args:
             - --enable-leader-election
-          image: controller:latest
+          image: ghcr.io/d-kuro/scheduled-pod-autoscaler:v0.0.1-rc.1
           name: manager
           ports:
             - containerPort: 8080
@@ -32,3 +32,4 @@ spec:
             httpGet:
               path: /healthz
               port: 9090
+      serviceAccountName: scheduled-pod-autoscaler

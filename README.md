@@ -1,6 +1,6 @@
 # scheduled-pod-autoscaler
 
-[![PkgGoDev](https://pkg.go.dev/badge/d-kuro/scheduled-pod-autoscaler)](https://pkg.go.dev/d-kuro/scheduled-pod-autoscaler) ![](https://github.com/d-kuro/scheduled-pod-autoscaler/workflows/main/badge.svg)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/d-kuro/scheduled-pod-autoscaler)](https://pkg.go.dev/github.com/d-kuro/scheduled-pod-autoscaler) ![](https://github.com/d-kuro/scheduled-pod-autoscaler/workflows/main/badge.svg)
 
 Custom Kubernetes controller for GitOps native scheduled scaling.
 

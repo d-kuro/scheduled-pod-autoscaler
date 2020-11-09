@@ -26,5 +26,5 @@ jobs:
         with:
           platforms: linux/amd64, linux/arm64
           push: true
-          tags: ${{ steps.docker_meta.outputs.tags }}
+          tags: ghcr.io/d-kuro/scheduled-pod-autoscaler:${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}

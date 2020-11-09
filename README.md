@@ -165,10 +165,10 @@ are included in a single YAML manifest file.
 By default, it is installed in the `kube-system` namespace.
 
 ```console
-# Kubernetes 1.16+
+# Kubernetes v1.16+
 $ kubectl apply -f https://raw.githubusercontent.com/d-kuro/scheduled-pod-autoscaler/v0.0.1/manifests/install/install.yaml
 
-# Kubernetes < 1.16
+# Kubernetes < v1.16
 $ kubectl apply -f https://raw.githubusercontent.com/d-kuro/scheduled-pod-autoscaler/v0.0.1/manifests/install/legacy/install.yaml
 ```
 
@@ -181,7 +181,11 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
+  # Kubernetes v1.16+
   - github.com/d-kuro/scheduled-pod-autoscaler/manifests/install?ref=v0.0.1
+
+  # Kubernetes < v1.16
+  # - github.com/d-kuro/scheduled-pod-autoscaler/manifests/install/legacy?ref=v0.0.1
 ```
 
 ## Spec

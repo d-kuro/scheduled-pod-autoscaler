@@ -210,6 +210,8 @@ func (r *ScheduledPodAutoscalerReconciler) reconcileHPA(ctx context.Context, log
 				log.Error(err, "unable to update schedule status", "schedule", schedule)
 			}
 		}
+
+		return updated, err
 	}
 
 	for _, schedule := range processSchedule {

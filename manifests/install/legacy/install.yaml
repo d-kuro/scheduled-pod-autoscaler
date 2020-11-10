@@ -770,7 +770,7 @@ spec:
         - --enable-leader-election
         command:
         - /manager
-        image: ghcr.io/d-kuro/scheduled-pod-autoscaler:v0.0.1
+        image: ghcr.io/d-kuro/scheduled-pod-autoscaler:v0.0.2
         livenessProbe:
           httpGet:
             path: /healthz

@@ -166,10 +166,10 @@ By default, it is installed in the `kube-system` namespace.
 
 ```console
 # Kubernetes v1.16+
-$ kubectl apply -f https://raw.githubusercontent.com/d-kuro/scheduled-pod-autoscaler/v0.0.1/manifests/install/install.yaml
+$ kubectl apply -f https://raw.githubusercontent.com/d-kuro/scheduled-pod-autoscaler/v0.0.2/manifests/install/install.yaml
 
 # Kubernetes < v1.16
-$ kubectl apply -f https://raw.githubusercontent.com/d-kuro/scheduled-pod-autoscaler/v0.0.1/manifests/install/legacy/install.yaml
+$ kubectl apply -f https://raw.githubusercontent.com/d-kuro/scheduled-pod-autoscaler/v0.0.2/manifests/install/legacy/install.yaml
 ```
 
 ### Kustomize
@@ -182,10 +182,10 @@ kind: Kustomization
 
 resources:
   # Kubernetes v1.16+
-  - github.com/d-kuro/scheduled-pod-autoscaler/manifests/install?ref=v0.0.1
+  - github.com/d-kuro/scheduled-pod-autoscaler/manifests/install?ref=v0.0.2
 
   # Kubernetes < v1.16
-  # - github.com/d-kuro/scheduled-pod-autoscaler/manifests/install/legacy?ref=v0.0.1
+  # - github.com/d-kuro/scheduled-pod-autoscaler/manifests/install/legacy?ref=v0.0.2
 ```
 
 ## Spec

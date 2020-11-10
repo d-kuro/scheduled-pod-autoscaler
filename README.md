@@ -226,19 +226,19 @@ The port of the metrics endpoint can be changed using the `metrics-addr` option.
 
 | name | type | description |
 | - | - | - |
-| `scheduled_pod_auroscaler_min_replicas` | gauge | Lower limit for the number of pods that can be set by the scheduled pod autoscaler |
-| `scheduled_pod_auroscaler_max_replicas` | gauge | Upper limit for the number of pods that can be set by the scheduled pod autoscaler |
+| `scheduled_pod_auroscaler_min_replicas` | `gauge` | Lower limit for the number of pods that can be set by the scheduled pod autoscaler |
+| `scheduled_pod_auroscaler_max_replicas` | `gauge` | Upper limit for the number of pods that can be set by the scheduled pod autoscaler |
 
 ## Controller Options
 
 | name | type | description |
 | - | - | - |
-| `--enable-leader-election` | bool | Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager. |
-| `--metrics-addr` | string | The address the metric endpoint binds to. (default ":8080") |
-| `--probe-addr` | string | The address the liveness probe and readiness probe endpoints bind to. (default ":9090") |
-| `--zap-devel` | bool | Development Mode defaults(encoder=consoleEncoder,logLevel=Debug,stackTraceLevel=Warn). Production Mode defaults(encoder=jsonEncoder,logLevel=Info,stackTraceLevel=Error) |
-| `--zap-encoder` | value | Zap log encoding ('json' or 'console') |
-| `--zap-log-level` | value | Zap Level to configure the verbosity of logging. Can be one of 'debug', 'info', 'error', or any integer value > 0 which corresponds to custom debug levels of increasing verbosity |
-| `--zap-stacktrace-level` | value | Zap Level at and above which stacktraces are captured (one of 'info', 'error'). |
-| `--kubeconfig` | string | Paths to a kubeconfig. Only required if out-of-cluster. |
-| `--master` | string | (Deprecated: switch to --kubeconfig) The address of the Kubernetes API server. Overrides any value in kubeconfig. Only required if out-of-cluster. |
+| `--enable-leader-election` | `bool` | Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager. |
+| `--metrics-addr` | `string` | The address the metric endpoint binds to. (default ":8080") |
+| `--probe-addr` | `string` | The address the liveness probe and readiness probe endpoints bind to. (default ":9090") |
+| `--zap-devel` | `bool` | Development Mode defaults(encoder=consoleEncoder,logLevel=Debug,stackTraceLevel=Warn). Production Mode defaults(encoder=jsonEncoder,logLevel=Info,stackTraceLevel=Error) |
+| `--zap-encoder` | `value` | Zap log encoding ('json' or 'console') |
+| `--zap-log-level` | `value` | Zap Level to configure the verbosity of logging. Can be one of 'debug', 'info', 'error', or any integer value > 0 which corresponds to custom debug levels of increasing verbosity |
+| `--zap-stacktrace-level` | `value` | Zap Level at and above which stacktraces are captured (one of 'info', 'error'). |
+| `--kubeconfig` | `string` | Paths to a kubeconfig. Only required if out-of-cluster. |
+| `--master` | `string` | (Deprecated: switch to --kubeconfig) The address of the Kubernetes API server. Overrides any value in kubeconfig. Only required if out-of-cluster. |

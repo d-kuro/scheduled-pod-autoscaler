@@ -1,0 +1,7 @@
+apiVersion: autoscaling.d-kuro.github.io/v1
+kind: Schedule
+metadata:
+  name: schedule-sample
+spec:
+  # Add fields here
+  foo: bar

@@ -1,0 +1,189 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.4.0
+  creationTimestamp: null
+  name: schedules.autoscaling.d-kuro.github.io
+spec:
+  group: autoscaling.d-kuro.github.io
+  names:
+    kind: Schedule
+    listKind: ScheduleList
+    plural: schedules
+    singular: schedule
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .spec.scaleTargetRef.name
+      name: REFERENCE
+      type: string
+    - jsonPath: .spec.type
+      name: TYPE
+      type: string
+    - jsonPath: .spec.startTime
+      name: STARTTIME
+      type: string
+    - jsonPath: .spec.endTime
+      name: ENDTIME
+      type: string
+    - jsonPath: .spec.startDayOfWeek
+      name: STARTDAYOFWEEK
+      type: string
+    - jsonPath: .spec.endDayOfWeek
+      name: ENDDAYOFWEEK
+      type: string
+    - jsonPath: .spec.minReplicas
+      name: MINPODS
+      priority: 1
+      type: integer
+    - jsonPath: .spec.maxReplicas
+      name: MAXPODS
+      priority: 1
+      type: integer
+    - jsonPath: .status.condition
+      name: STATUS
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: AGE
+      type: date
+    name: v1
+    schema:
+      openAPIV3Schema:
+        description: Schedule is the Schema for the schedules API.
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: ScheduleSpec defines the desired state of Schedule.
+            properties:
+              description:
+                description: Description is schedule description.
+                type: string
+              endDayOfWeek:
+                description: EndDayOfWeek is scaling end day of week. Represented
+                  by "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
+                  "Saturday".
+                enum:
+                - Sunday
+                - Monday
+                - Tuesday
+                - Wednesday
+                - Thursday
+                - Friday
+                - Saturday
+                - ""
+                type: string
+              endTime:
+                description: EndTime is scaling end time. Defined in RFC3339 based
+                  format. Different formats are evaluated depending on ScheduleType.
+                  e.g. OneShot(yyyy-MM-ddTHH:mm), Weekly(HH:mm), Daily(HH:mm)
+                type: string
+              maxReplicas:
+                description: MaxReplicas is the upper limit for the number of replicas
+                  to which the autoscaler can scale up.
+                format: int32
+                minimum: 1
+                type: integer
+              minReplicas:
+                description: MinReplicas is the lower limit for the number of replicas
+                  to which the autoscaler can scale down. It defaults to 1 pod.
+                format: int32
+                minimum: 1
+                type: integer
+              scaleTargetRef:
+                description: ScaleTargetRef points to the target resource to scale,
+                  and is used to the pods for which metrics should be collected, as
+                  well as to actually change the replica count.
+                properties:
+                  apiVersion:
+                    description: API version of the referent
+                    type: string
+                  kind:
+                    description: 'Kind of the referent; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"'
+                    type: string
+                  name:
+                    description: 'Name of the referent; More info: http://kubernetes.io/docs/user-guide/identifiers#names'
+                    type: string
+                required:
+                - kind
+                - name
+                type: object
+              startDayOfWeek:
+                description: StartDayOfWeek is scaling start day of week. Represented
+                  by "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
+                  "Saturday".
+                enum:
+                - Sunday
+                - Monday
+                - Tuesday
+                - Wednesday
+                - Thursday
+                - Friday
+                - Saturday
+                - ""
+                type: string
+              startTime:
+                description: StartTime is scaling start time. Defined in RFC3339 based
+                  format. Different formats are evaluated depending on ScheduleType.
+                  e.g. OneShot(yyyy-MM-ddTHH:mm), Weekly(HH:mm), Daily(HH:mm)
+                type: string
+              suspend:
+                description: Suspend indicates whether to suspend this schedule. (default
+                  is false)
+                type: boolean
+              timeZone:
+                description: TimeZone is the name of the timezone used in the argument
+                  of the time.LoadLocation(name string) function. StartTime and EndTime
+                  are interpreted as the time in the time zone specified by TimeZone.
+                  If not specified, the time will be interpreted as UTC.
+                type: string
+              type:
+                description: ScheduleType is a type of schedule represented by "Weekly",
+                  "Daily", "OneShot".
+                enum:
+                - Weekly
+                - Daily
+                - OneShot
+                type: string
+            required:
+            - endTime
+            - scaleTargetRef
+            - startTime
+            - type
+            type: object
+          status:
+            description: ScheduleStatus defines the observed state of Schedule.
+            properties:
+              condition:
+                description: Condition is schedule status type.
+                type: string
+              lastTransitionTime:
+                description: LastTransitionTime is the last time the condition transitioned
+                  from one status to another.
+                format: date-time
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

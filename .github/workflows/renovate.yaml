@@ -14,6 +14,12 @@ jobs:
       - name: go mod tidy
         shell: bash --noprofile --norc {0}
         run: |
+          if [ ! "$(git show HEAD --pretty=format:%ae -s)" = "bot@renovateapp.com" ]
+          then
+            echo "HEAD commit author is not Renovate Bot" >&2
+            exit 0
+          fi
+
           go mod tidy && git diff -s --exit-code go.sum
           if [ $? -ne 0 ]; then
             git remote set-url origin https://${GIT_USER}:${GITHUB_TOKEN}@github.com/d-kuro/scheduled-pod-autoscaler.git
@@ -25,5 +31,5 @@ jobs:
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GIT_USER: Renovate Bot
-          GIT_EMAIL: bot@renovateapp.com
+          GIT_USER: d-kuro
+          GIT_EMAIL: kurosawa7620@gmail.com

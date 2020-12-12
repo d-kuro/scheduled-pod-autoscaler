@@ -42,8 +42,7 @@ type ScheduleReconciler struct {
 // +kubebuilder:rbac:groups=autoscaling.d-kuro.github.io,resources=schedules,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=autoscaling.d-kuro.github.io,resources=schedules/status,verbs=get;update;patch
 
-func (r *ScheduleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
-	ctx := context.Background()
+func (r *ScheduleReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := r.Log.WithValues("schedule", req.NamespacedName)
 
 	var schedule autoscalingv1.Schedule

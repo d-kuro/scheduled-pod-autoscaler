@@ -45,8 +45,7 @@ type ScheduledPodAutoscalerReconciler struct {
 // +kubebuilder:rbac:groups=autoscaling.d-kuro.github.io,resources=scheduledpodautoscalers/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=autoscaling,resources=horizontalpodautoscalers,verbs=get;list;watch;create;update;patch;delete
 
-func (r *ScheduledPodAutoscalerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
-	ctx := context.Background()
+func (r *ScheduledPodAutoscalerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := r.Log.WithValues("scheduledpodautoscaler", req.NamespacedName)
 
 	var spa autoscalingv1.ScheduledPodAutoscaler
@@ -348,7 +347,7 @@ func setScheduledPodAutoscalerCondition(
 
 const ownerControllerField = ".metadata.controller"
 
-func indexByOwnerScheduledPodAutoscaler(obj runtime.Object) []string {
+func indexByOwnerScheduledPodAutoscaler(obj client.Object) []string {
 	schedule := obj.(*autoscalingv1.Schedule)
 
 	owner := metav1.GetControllerOf(schedule)

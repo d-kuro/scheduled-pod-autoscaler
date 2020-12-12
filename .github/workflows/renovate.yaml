@@ -20,10 +20,10 @@ jobs:
             git config --global user.name ${GIT_USER}
             git config --global user.email ${GIT_EMAIL}
             git add go.mod go.sum
-            git commit -m "go mod tidy"
-            git push origin HEAD:${GITHUB_REF}
+            git commit --amend --no-edit
+            git push -f origin $(git symbolic-ref --short --quiet HEAD)
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GIT_USER: d-kuro
-          GIT_EMAIL: kurosawa7620@gmail.com
+          GIT_USER: Renovate Bot
+          GIT_EMAIL: bot@renovateapp.com

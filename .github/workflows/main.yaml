@@ -41,6 +41,6 @@ jobs:
       - uses: golangci/golangci-lint-action@v2
         with:
           version: v1.33
-          args: --issues-exit-code=0 --timeout=3m0s
+          args: --timeout=3m0s
       - name: Run tests
         run: make test

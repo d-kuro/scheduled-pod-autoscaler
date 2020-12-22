@@ -60,6 +60,10 @@ func (r *ScheduledPodAutoscalerReconciler) Reconcile(req ctrl.Request) (ctrl.Res
 		return ctrl.Result{}, err
 	}
 
+	if spa.DeletionTimestamp != nil {
+		return ctrl.Result{}, nil
+	}
+
 	var hpa hpav2beta2.HorizontalPodAutoscaler
 	if err := r.Get(ctx, req.NamespacedName, &hpa); apierrors.IsNotFound(err) {
 		log.Info("unable to fetch hpa, try to create one", "namespacedName", req.NamespacedName)

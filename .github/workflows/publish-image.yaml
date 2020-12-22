@@ -12,8 +12,7 @@ jobs:
         uses: crazy-max/ghaction-docker-meta@v1
         with:
           images: d-kuro/scheduled-pod-autoscaler
-          tag-match: v(.*)
-          tag-match-latest: false
+          tag-latest: false
       - uses: docker/setup-qemu-action@v1
       - uses: docker/setup-buildx-action@v1
         with:

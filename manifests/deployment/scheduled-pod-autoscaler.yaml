@@ -17,7 +17,7 @@ spec:
             - /manager
           args:
             - --enable-leader-election
-          image: ghcr.io/d-kuro/scheduled-pod-autoscaler:v0.0.2
+          image: ghcr.io/d-kuro/scheduled-pod-autoscaler:v0.0.3
           name: manager
           ports:
             - containerPort: 8080

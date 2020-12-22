@@ -57,6 +57,10 @@ func (r *ScheduleReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, err
 	}
 
+	if schedule.DeletionTimestamp != nil {
+		return ctrl.Result{}, nil
+	}
+
 	namespacedName := types.NamespacedName{
 		Namespace: schedule.Namespace,
 		Name:      schedule.Spec.ScaleTargetRef.Name,

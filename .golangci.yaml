@@ -12,6 +12,7 @@ linters:
     - gomnd
     - lll
     - maligned
+    - paralleltest
     - testpackage
     - wrapcheck
     - wsl

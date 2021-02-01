@@ -6,7 +6,7 @@ require (
 	github.com/go-logr/logr v0.3.0
 	github.com/google/go-cmp v0.5.4
 	github.com/onsi/ginkgo v1.14.2
-	github.com/onsi/gomega v1.10.4
+	github.com/onsi/gomega v1.10.5
 	github.com/prometheus/client_golang v1.9.0
 	k8s.io/api v0.19.2
 	k8s.io/apimachinery v0.19.2

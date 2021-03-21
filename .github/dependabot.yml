@@ -1,0 +1,18 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: daily
+    reviewers:
+      - d-kuro
+  - package-ecosystem: gomod
+    directory: "/"
+    schedule:
+      interval: daily
+    reviewers:
+      - d-kuro
+    ignore:
+      - dependency-name: "k8s.io/api"
+      - dependency-name: "k8s.io/apimachinery"
+      - dependency-name: "k8s.io/client-go"

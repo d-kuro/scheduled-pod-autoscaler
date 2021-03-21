@@ -10,12 +10,22 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
         with:
-          go-version: 1.15
+          go-version: 1.16
       - uses: actions/cache@v2
         with:
           path: ~/go/pkg/mod
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
+      # Since the output may change depending on the version of kustomize.
+      # Install kustomize with a pinned version instead of pre-installed on GitHub Actions.
+      - name: Install kustomize
+        run: |
+          version='v4.0.5'
+          os=$(go env GOOS)
+          arch=$(go env GOARCH)
+
+          curl -L https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2F${version}/kustomize_${version}_${os}_${arch}.tar.gz | tar -xz -C /tmp/
+          sudo mv /tmp/kustomize /usr/local/bin/kustomize
       - name: Check generated files up to date
         run: make check-generated-files-up-to-date

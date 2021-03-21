@@ -40,7 +40,7 @@ jobs:
         run: go mod tidy && git diff -s --exit-code go.sum
       - uses: golangci/golangci-lint-action@v2
         with:
-          version: v1.33
+          version: v1.38
           args: --timeout=3m0s
       - name: Run tests
         run: make test

@@ -352,7 +352,10 @@ func setScheduledPodAutoscalerCondition(
 const ownerControllerField = ".metadata.controller"
 
 func indexByOwnerScheduledPodAutoscaler(obj client.Object) []string {
-	schedule := obj.(*autoscalingv1.Schedule)
+	schedule, ok := obj.(*autoscalingv1.Schedule)
+	if !ok {
+		return nil
+	}
 
 	owner := metav1.GetControllerOf(schedule)
 	if owner == nil {
